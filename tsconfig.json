@@ -1,11 +1,6 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "declarationDir": "./dist",
-    "outDir": "./dist",
-    "declaration": true,
-    "importHelpers": true,
-    "preserveWatchOutput": true
+    "noEmit": true
   }
 }

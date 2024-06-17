@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+    "declaration": true,
+    "importHelpers": true,
+    "preserveWatchOutput": true
+  },
+  "include": ["src"]
+}
