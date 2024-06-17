@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import { checkOperations } from "./main";
-import { open } from "node:fs/promises";
+import { open, readdir, stat, readFile } from "node:fs/promises";
 import { kjsonlLines } from "kjsonl";
+import { SourceLike } from "./interfaces";
 
 const { values, positionals } = parseArgs({
   options: {
@@ -16,16 +17,51 @@ const { values, positionals } = parseArgs({
   strict: true,
 });
 
-async function* getOperations() {
-  const KJSONL_FILE_PATH = positionals[0] ?? "./documents.kjsonl";
-  const handle = await open(KJSONL_FILE_PATH, "r");
-  for await (const line of kjsonlLines(handle)) {
-    const hash = line.keyBuffer.toString("utf8");
-    const value = JSON.parse(line.valueBuffer.toString("utf8"));
-    const sourceString = typeof value === "string" ? value : value.document;
-    yield { body: sourceString, name: hash };
+async function* getOperationsFromKJSONL(
+  path: string,
+): AsyncIterableIterator<SourceLike> {
+  const handle = await open(path, "r");
+  try {
+    for await (const line of kjsonlLines(handle)) {
+      const hash = line.keyBuffer.toString("utf8");
+      const value = JSON.parse(line.valueBuffer.toString("utf8"));
+      const sourceString = typeof value === "string" ? value : value.document;
+      yield { body: sourceString, name: hash };
+    }
+  } finally {
+    await handle.close();
   }
-  await handle.close();
+}
+
+async function* getOperationsFromPath(
+  path: string,
+): AsyncIterableIterator<SourceLike> {
+  const stats = await stat(path);
+
+  if (stats.isDirectory()) {
+    const files = await readdir(path);
+    for (const file of files) {
+      if (!file.startsWith(".")) {
+        yield* getOperationsFromPath(path + "/" + file);
+      }
+    }
+  } else {
+    if (path.endsWith(".graphql")) {
+      const body = await readFile(path, "utf8");
+      yield { body, name: path };
+    } else if (path.endsWith(".kjsonl")) {
+      yield* getOperationsFromKJSONL(path);
+    } else {
+      // TODO: move this to warnings
+      throw new Error(`Path '${path}' not understood`);
+    }
+  }
+}
+
+async function* getOperations(): AsyncIterableIterator<SourceLike> {
+  for (const positional of positionals) {
+    yield* getOperationsFromPath(positional);
+  }
 }
 
 async function main() {
