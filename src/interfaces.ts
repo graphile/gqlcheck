@@ -1,4 +1,4 @@
-import { DepthByCoordinate } from "@graphile/depth-limit";
+import { GraphQLFormattedError } from "graphql";
 
 export interface WorkerData {
   configPath: string | null | undefined;
@@ -7,6 +7,18 @@ export interface WorkerData {
 export interface CheckDocumentRequest {
   sourceName: string;
   sourceString: string;
+}
+
+export interface CheckDocumentResult {
+  sourceName: string;
+  errors: GraphQLFormattedError[];
+  operations: ReadonlyArray<CheckDocumentOperationResult>;
+}
+
+export interface CheckDocumentOperationResult {
+  operationName: string | undefined;
+  operationKind: "query" | "mutation" | "subscription";
+  issues: ReadonlyArray<Issue>;
 }
 
 export interface Issue {
@@ -22,18 +34,14 @@ export interface Issue {
   details?: string;
 }
 
-export interface CheckDocumentOperationResult {
-  operationName: string | undefined;
-  operationKind: "query" | "mutation" | "subscription";
-  issues: ReadonlyArray<Issue>;
-}
-
-export interface CheckDocumentResult {
-  errors: string[];
-  operations: ReadonlyArray<CheckDocumentOperationResult>;
-}
-
 export interface SourceLike {
   body: string;
   name: string;
+}
+
+export interface Results {
+  [sourceName: string]: {
+    sourceString: string;
+    result: CheckDocumentResult;
+  };
 }

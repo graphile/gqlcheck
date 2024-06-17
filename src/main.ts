@@ -7,6 +7,7 @@ import {
   WorkerData,
   Issue,
   SourceLike,
+  Results,
 } from "./interfaces";
 import { loadConfig } from "graphile-config/load";
 import debugFactory from "debug";
@@ -134,14 +135,6 @@ export async function checkOperations(
     return { request, resultPromise };
   }
 
-  const results: Record<
-    string,
-    {
-      sourceString: string;
-      result: CheckDocumentResult;
-    }
-  > = Object.create(null);
-
   const startedTasks: Task<CheckDocumentRequest, CheckDocumentResult>[] = [];
   let index = -1;
   const sourceNames = new Set<string>();
@@ -180,56 +173,45 @@ export async function checkOperations(
   for (const task of startedTasks) {
     const request = task.request;
     const result = await task.resultPromise;
+    if (result.sourceName !== request.sourceName) {
+      throw new Error(
+        `Internal consistency error: the result we received from the worker was for source '${result.sourceName}', but the request was for '${request.sourceName}'`,
+      );
+    }
     allResults.push({ request, result });
   }
 
-  const resultsByOperationName: {
-    [operationName: string]: {
-      operationName: string;
-      operationKind: string;
-      issues: Issue[];
-    };
-  } = Object.create(null);
-  const failed: Array<{
-    request: CheckDocumentRequest;
-    result: CheckDocumentResult;
-  }> = [];
-
+  const results: Results = Object.create(null);
+  const operationKindByOperationName = new Map<string, string>();
   for (const { request, result } of allResults) {
     const { sourceName, sourceString } = request;
     const { errors, operations } = result;
     for (const operation of operations) {
-      const { operationName = "(anon)", operationKind, issues } = operation;
+      const { operationName, operationKind, issues } = operation;
+      if (!operationName) continue;
       debug(`%s: %s %s`, sourceName, operationKind, operationName);
-      let operationResult = resultsByOperationName[operationName];
-      if (!operationResult) {
-        operationResult = {
-          operationName,
-          operationKind,
-          issues: [...issues],
-        };
-        resultsByOperationName[operationName] = operationResult;
-      } else if (operationResult.operationKind !== operationKind) {
+      const expectedOperationKind =
+        operationKindByOperationName.get(operationName);
+      if (!expectedOperationKind) {
+        operationKindByOperationName.set(operationName, operationKind);
+      } else if (expectedOperationKind !== operationKind) {
         throw new Error(
-          `Named operation '${operationName}' previously existed with operation type '${operationResult.operationKind}', but another operation with the same name now has type '${operationKind}'. This is forbidden.`,
+          `Named operation '${operationName}' previously existed with operation type '${expectedOperationKind}', but another operation with the same name now has type '${operationKind}'. This is forbidden.`,
         );
       } else {
-        operationResult.issues.push(...issues);
+        // All good
       }
     }
     results[sourceName] = {
       sourceString,
       result,
     };
-    if (errors.length) {
-      failed.push({ request, result });
-    }
   }
 
   releaseWorkers();
 
   return {
-    resultsByOperationName,
+    results,
   };
 
   /*

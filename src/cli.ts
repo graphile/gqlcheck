@@ -4,6 +4,7 @@ import { checkOperations } from "./main";
 import { open, readdir, stat, readFile } from "node:fs/promises";
 import { kjsonlLines } from "kjsonl";
 import { SourceLike } from "./interfaces";
+import { printResults } from "./print.js";
 
 const { values, positionals } = parseArgs({
   options: {
@@ -11,6 +12,11 @@ const { values, positionals } = parseArgs({
       type: "string",
       short: "C",
       // description: "The path to the config file",
+    },
+    "update-baseline": {
+      type: "boolean",
+      short: "u",
+      // description: "Update the baseline.json file to allow all passed documents even if they break the rules."
     },
   },
   allowPositionals: true,
@@ -65,8 +71,8 @@ async function* getOperations(): AsyncIterableIterator<SourceLike> {
 }
 
 async function main() {
-  const results = await checkOperations(getOperations, values.config);
-  console.dir(results);
+  const { results } = await checkOperations(getOperations, values.config);
+  console.log(printResults(results));
 }
 
 main().catch((e) => {

@@ -1,6 +1,13 @@
 import { isMainThread, parentPort, workerData } from "node:worker_threads";
 import { readFileSync } from "node:fs";
-import { buildASTSchema, Kind, parse, Source, validateSchema } from "graphql";
+import {
+  buildASTSchema,
+  Kind,
+  parse,
+  Source,
+  validate,
+  validateSchema,
+} from "graphql";
 import {
   CheckDocumentOperationResult,
   CheckDocumentRequest,
@@ -54,12 +61,21 @@ async function main() {
     );
     if (operationDefinitions.length === 0) {
       return {
+        sourceName,
         operations: [],
-        errors: ["Could not find any operations in this document"],
+        errors: [{ message: "Could not find any operations in this document" }],
       };
     }
 
     // TODO: regular validation
+    const validationErrors = validate(schema, document);
+    if (validationErrors.length > 0) {
+      return {
+        sourceName,
+        operations: [],
+        errors: validationErrors.map((e) => e.toJSON()),
+      };
+    }
 
     const operations = operationDefinitions.map(
       (operationDefinition): CheckDocumentOperationResult => {
@@ -122,6 +138,7 @@ async function main() {
     );
 
     return {
+      sourceName,
       errors: [],
       operations,
     };
