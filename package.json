@@ -33,6 +33,7 @@
   "homepage": "https://github.com/graphile/opcheck#readme",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
     "eslint": "^9.5.0",
