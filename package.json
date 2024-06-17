@@ -1,0 +1,49 @@
+{
+  "name": "gqlopcheck",
+  "version": "0.0.0",
+  "description": "Performs additional checks on your GraphQL operations to ensure they conform to your rules, whilst allow-listing existing operations and their constituent parts (and allowing overrides on a per-field basis). Rules include max selection set depth, max list nesting, require pagination, limit self-referencing loops, etc. Add your own rules!",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/opcheck.git"
+  },
+  "keywords": [
+    "graphql",
+    "validation",
+    "persisted",
+    "trusted",
+    "stored",
+    "queries",
+    "operations",
+    "documents",
+    "check",
+    "checkin",
+    "rules",
+    "checks",
+    "gql"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/opcheck/issues"
+  },
+  "homepage": "https://github.com/graphile/opcheck#readme",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "eslint": "^9.5.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
+    "eslint_d": "^13.1.2",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "tslib": "^2.6.3"
+  }
+}
