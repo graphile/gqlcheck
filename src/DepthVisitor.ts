@@ -1,3 +1,4 @@
+import * as assert from "node:assert";
 import {
   ASTVisitor,
   FragmentDefinitionNode,
@@ -25,49 +26,68 @@ function newDepthInfo(): DepthInfo {
   };
 }
 
-interface Root {
+interface Depths {
+  fields: DepthInfo;
+  lists: DepthInfo;
+  introspectionFields: DepthInfo;
+  introspectionLists: DepthInfo;
+}
+
+interface IRoot {
   type: "operation" | "fragment";
   name: string | undefined;
-  depths: {
-    fields: DepthInfo;
-    lists: DepthInfo;
-    introspectionFields: DepthInfo;
-    introspectionLists: DepthInfo;
-  };
+  depths: Depths;
   fragmentReferences: {
     [operationPath: string]: {
       [fragmentName: string]: {
-        depthValues: {
-          [key in keyof Root["depths"]]: number;
-        };
+        depthValues: DepthValues;
       };
     };
   };
 }
+type DepthValues = {
+  [key in keyof Depths]: number;
+};
+interface OperationRoot extends IRoot {
+  type: "operation";
+}
+interface FragmentRoot extends IRoot {
+  type: "fragment";
+  name: string;
+}
+type Root = OperationRoot | FragmentRoot;
 
 /** Used when the fragment references have been resolved */
 interface ResolvedOperation {
   name: string | undefined;
-  depths: {
-    fields: DepthInfo;
-    lists: DepthInfo;
-    introspectionFields: DepthInfo;
-    introspectionLists: DepthInfo;
+  depths: Depths;
+}
+
+function newDepths(): Depths {
+  return {
+    fields: newDepthInfo(),
+    lists: newDepthInfo(),
+    introspectionFields: newDepthInfo(),
+    introspectionLists: newDepthInfo(),
   };
 }
 
 function newRoot(node: OperationDefinitionNode | FragmentDefinitionNode): Root {
-  return {
-    type: node.kind === Kind.OPERATION_DEFINITION ? "operation" : "fragment",
-    name: node.name?.value,
-    depths: {
-      fields: newDepthInfo(),
-      lists: newDepthInfo(),
-      introspectionFields: newDepthInfo(),
-      introspectionLists: newDepthInfo(),
-    },
-    fragmentReferences: Object.create(null),
-  };
+  if (node.kind === Kind.OPERATION_DEFINITION) {
+    return {
+      type: "operation",
+      name: node.name?.value,
+      depths: newDepths(),
+      fragmentReferences: Object.create(null),
+    };
+  } else {
+    return {
+      type: "fragment",
+      name: node.name.value,
+      depths: newDepths(),
+      fragmentReferences: Object.create(null),
+    };
+  }
 }
 
 interface State {
@@ -82,12 +102,136 @@ function newState(): State {
   };
 }
 
-let state: State = newState();
-state.complete = true;
+function resolveFragment(
+  fragmentRootByName: Record<string, FragmentRoot>,
+  depths: Depths,
+  operationPath: string,
+  fragmentName: string,
+  visitedFragments: string[],
+) {
+  const fragmentRoot = fragmentRootByName[fragmentName];
+  if (!fragmentRoot) return;
+  if (visitedFragments.includes(fragmentName)) {
+    return;
+  }
+
+  visitedFragments.push(fragmentName);
+  try {
+    // Step 1: add all the fragments own depths
+    for (const key of Object.keys(fragmentRoot.depths) as (keyof Depths)[]) {
+      const { max: fragMax, coordsByDepth: fragCoordsByDepth } =
+        fragmentRoot.depths[key];
+      const adjustedMax = depths[key].current + fragMax;
+      if (adjustedMax > depths[key].max) {
+        depths[key].max = adjustedMax;
+      }
+      for (const [fragDepth, fragCoords] of fragCoordsByDepth) {
+        const transformedCoords = fragCoords.map(
+          (c) => `${operationPath}>${c}`,
+        );
+        const depth = depths[key].current + fragDepth;
+        const list = depths[key].coordsByDepth.get(depth);
+        if (list) {
+          // More performant than list.push(...transformedCoords)
+          transformedCoords.forEach((c) => list.push(c));
+        } else {
+          depths[key].coordsByDepth.set(depth, transformedCoords);
+        }
+      }
+    }
+
+    // Step 2: traverse to the next fragment
+    traverseFragmentReferences(
+      fragmentRootByName,
+      depths,
+      fragmentRoot.fragmentReferences,
+      visitedFragments,
+    );
+  } finally {
+    const popped = visitedFragments.pop();
+    assert.equal(
+      popped,
+      fragmentName,
+      "Something went wrong when popping fragment name?",
+    );
+  }
+}
+function traverseFragmentReferences(
+  fragmentRootByName: Record<string, FragmentRoot>,
+  depths: Depths,
+  fragmentReferences: IRoot["fragmentReferences"],
+  visitedFragments: string[],
+): void {
+  for (const [operationPath, depthsByFragmentReference] of Object.entries(
+    fragmentReferences,
+  )) {
+    for (const [fragmentName, spec] of Object.entries(
+      depthsByFragmentReference,
+    )) {
+      for (const key of Object.keys(depths) as (keyof Depths)[]) {
+        depths[key].current += spec.depthValues[key];
+      }
+      resolveFragment(
+        fragmentRootByName,
+        depths,
+        operationPath,
+        fragmentName,
+        visitedFragments,
+      );
+      for (const key of Object.keys(depths) as (keyof Depths)[]) {
+        depths[key].current -= spec.depthValues[key];
+      }
+    }
+  }
+}
+
+function resolveOperationRoot(
+  fragmentRootByName: Record<string, FragmentRoot>,
+  operationRoot: OperationRoot,
+): ResolvedOperation {
+  const depths = newDepths();
+  for (const key of Object.keys(depths) as ReadonlyArray<keyof Depths>) {
+    depths[key].max = operationRoot.depths[key].max;
+    depths[key].coordsByDepth = new Map(
+      operationRoot.depths[key].coordsByDepth,
+    );
+  }
+  traverseFragmentReferences(
+    fragmentRootByName,
+    depths,
+    operationRoot.fragmentReferences,
+    [],
+  );
+  return {
+    name: operationRoot.name,
+    depths,
+  };
+}
+
+function resolveRoots(state: State): readonly ResolvedOperation[] {
+  const operationRoots: OperationRoot[] = [];
+  const fragmentRootByName: {
+    [fragmentName: string]: FragmentRoot;
+  } = Object.create(null);
+
+  for (const root of state.roots) {
+    if (root.type === "operation") {
+      operationRoots.push(root);
+    } else {
+      fragmentRootByName[root.name] = root;
+    }
+  }
+
+  return operationRoots.map((root) =>
+    resolveOperationRoot(fragmentRootByName, root),
+  );
+}
 
 export function DepthVisitor(context: RulesContext): ASTVisitor {
+  let state: State = newState();
+  state.complete = true;
   let currentRoot: Root | null = null;
-  function incDepth<TKey extends keyof Root["depths"]>(key: TKey) {
+  function incDepth<TKey extends keyof Depths>(key: TKey) {
     if (!currentRoot) {
       throw new Error(
         `DepthVisitor attempted to increment depth, but there's no currentRoot!`,
@@ -106,7 +250,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         .push(context.getOperationPath());
     }
   }
-  function decDepth<TKey extends keyof Root["depths"]>(key: TKey) {
+  function decDepth<TKey extends keyof Depths>(key: TKey) {
     if (!currentRoot) {
       throw new Error(
         `DepthVisitor attempted to increment depth, but there's no currentRoot!`,
@@ -124,9 +268,10 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
       },
       leave(node) {
         // Finalize depths by applying all the fragment depths to the operations
+        const resolvedOperation = resolveRoots(state);
 
         // Report the errors
-        console.dir(state, { depth: 4 });
+        console.dir(resolvedOperation, { depth: 4 });
 
         // Clean up
         state.complete = true;
@@ -169,7 +314,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         }
         const operationPath = context.getOperationPath();
         const fragmentName = node.name.value;
-        const depthValues: { [Key in keyof Root["depths"]]: number } = {
+        const depthValues: { [Key in keyof Depths]: number } = {
           fields: currentRoot.depths.fields.current,
           lists: currentRoot.depths.lists.current,
           introspectionFields: currentRoot.depths.introspectionFields.current,
