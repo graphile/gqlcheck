@@ -11,6 +11,9 @@ import {
   OperationDefinitionNode,
 } from "graphql";
 import { RulesContext } from "./rulesContext";
+import { RuleError } from "./ruleError";
+
+const RULE_NAME = "DepthLimit";
 
 interface DepthInfo {
   current: number;
@@ -301,15 +304,6 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         for (const resolvedOperation of resolvedOperations) {
           const operationName = resolvedOperation.name;
           const config: GraphileConfig.OpcheckRuleConfig = {
-            // Defaults
-            maxDepth: 12,
-            maxListDepth: 4,
-            maxSelfReferentialDepth: 2,
-            maxIntrospectionDepth: 12,
-            maxIntrospectionListDepth: 3,
-            maxIntrospectionSelfReferentialDepth: 2,
-            maxDepthByFieldCoordinates: Object.create(null),
-
             // Global configuration
             ...resolvedPreset.opcheck?.config,
 
@@ -318,9 +312,16 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
               ? resolvedPreset.opcheck?.operationOverrides?.[operationName]
               : null),
           };
-          const { maxDepthByFieldCoordinates: userMaxDepthByFieldCoordinates } =
-            config;
-          const maxDepthByFieldCoordinates = {
+          const {
+            maxDepth = 12,
+            maxListDepth = 4,
+            maxSelfReferentialDepth = 2,
+            maxIntrospectionDepth = 12,
+            maxIntrospectionListDepth = 3,
+            maxIntrospectionSelfReferentialDepth = 2,
+          } = config;
+          const maxDepthByFieldCoordinates: Record<string, number> = {
+            // Defaults
             "Query.__schema": 1,
             "Query.__type": 1,
             "__Type.fields": 1,
@@ -330,10 +331,94 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
             "__Type.possibleTypes": 1,
             "__Field.args": 1,
             "__Field.type": 1,
-            ...userMaxDepthByFieldCoordinates,
+
+            // Global config
+            ...resolvedPreset.opcheck?.config?.maxDepthByFieldCoordinates,
+
+            // Override for this operation
+            ...(operationName
+              ? resolvedPreset.opcheck?.operationOverrides?.[operationName]
+                  ?.maxDepthByFieldCoordinates
+              : null),
           };
-          console.dir(maxDepthByFieldCoordinates);
-          console.dir(resolvedOperation, { depth: 4 });
+
+          // Now see if we've exceeded the limits
+          for (const key of Object.keys(resolvedOperation.depths)) {
+            const { max, coordsByDepth } = resolvedOperation.depths[key]!;
+            const selfReferential = key.includes(".");
+            const [limit, override, label] = ((): [
+              limit: number,
+              override: GraphileConfig.OpcheckRuleConfig,
+              label: string,
+            ] => {
+              if (selfReferential) {
+                // Schema coordinate
+                const isIntrospection =
+                  key.startsWith("__") || key.includes(".__");
+                const limit =
+                  maxDepthByFieldCoordinates[key] ??
+                  (isIntrospection
+                    ? maxIntrospectionSelfReferentialDepth
+                    : maxSelfReferentialDepth);
+                return [
+                  limit,
+                  { maxDepthByFieldCoordinates: { [key]: max } },
+                  `Self-reference limit for field '${key}'`,
+                ];
+              } else {
+                switch (key) {
+                  case "fields":
+                    return [
+                      maxDepth,
+                      { maxDepth: max },
+                      "Maximum selection depth limit",
+                    ];
+                  case "lists":
+                    return [
+                      maxListDepth,
+                      { maxListDepth: max },
+                      "Maximum list nesting depth limit",
+                    ];
+                  case "introspectionFields":
+                    return [
+                      maxIntrospectionDepth,
+                      { maxIntrospectionDepth: max },
+                      "Maximum introspection selection depth limit",
+                    ];
+                  case "introspectionLists":
+                    return [
+                      maxIntrospectionListDepth,
+                      { maxIntrospectionListDepth: max },
+                      "Maximum introspection list nesting depth limit",
+                    ];
+                  default: {
+                    throw new Error(`Key '${key}' has no associated setting?`);
+                  }
+                }
+              }
+            })();
+            if (max > limit) {
+              // Uh-oh!
+              console.log(`Uh-oh! ${max} > ${limit}`);
+              const operationCoordinates: string[] = [];
+              for (let i = limit + 1; i <= max; i++) {
+                coordsByDepth
+                  .get(i)
+                  ?.forEach((c) => operationCoordinates.push(c));
+              }
+              const error = new RuleError(
+                `${label} exceeded: ${max} > ${limit}`,
+                {
+                  ruleName: RULE_NAME,
+                  operationName,
+                  operationCoordinates,
+                  override,
+                },
+              );
+              context.reportError(error);
+            }
+          }
+          // console.dir(resolvedOperation, { depth: 4 });
         }
 
         // Clean up
