@@ -316,7 +316,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
             maxDepth = 12,
             maxListDepth = 4,
             maxSelfReferentialDepth = 2,
-            maxIntrospectionDepth = 12,
+            maxIntrospectionDepth = 14,
             maxIntrospectionListDepth = 3,
             maxIntrospectionSelfReferentialDepth = 2,
           } = config;
@@ -327,7 +327,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
             "__Type.fields": 1,
             "__Type.inputFields": 1,
             "__Type.interfaces": 1,
-            "__Type.ofType": 8,
+            "__Type.ofType": 9,
             "__Type.possibleTypes": 1,
             "__Field.args": 1,
             "__Field.type": 1,
