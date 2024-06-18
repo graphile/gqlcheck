@@ -15,8 +15,13 @@ declare global {
     interface OpcheckRuleConfig {
       maxDepth?: number;
       maxListDepth?: number;
+      maxSelfReferentialDepth?: number;
       maxIntrospectionDepth?: number;
       maxIntrospectionListDepth?: number;
+      maxIntrospectionSelfReferentialDepth?: number;
+      maxDepthByFieldCoordinates?: {
+        [fieldCoordinate: string]: number;
+      };
     }
   }
 }

@@ -26,12 +26,14 @@ function newDepthInfo(): DepthInfo {
   };
 }
 
-interface Depths {
+type Depths = {
   fields: DepthInfo;
   lists: DepthInfo;
   introspectionFields: DepthInfo;
   introspectionLists: DepthInfo;
-}
+} & {
+  [coordinate: string]: DepthInfo | undefined;
+};
 
 interface IRoot {
   type: "operation" | "fragment";
@@ -46,7 +48,7 @@ interface IRoot {
   };
 }
 type DepthValues = {
-  [key in keyof Depths]: number;
+  [key in keyof Depths]: number | undefined;
 };
 interface OperationRoot extends IRoot {
   type: "operation";
@@ -120,7 +122,10 @@ function resolveFragment(
     // Step 1: add all the fragments own depths
     for (const key of Object.keys(fragmentRoot.depths) as (keyof Depths)[]) {
       const { max: fragMax, coordsByDepth: fragCoordsByDepth } =
-        fragmentRoot.depths[key];
+        fragmentRoot.depths[key]!;
+      if (!depths[key]) {
+        depths[key] = newDepthInfo();
+      }
       const adjustedMax = depths[key].current + fragMax;
       if (adjustedMax > depths[key].max) {
         depths[key].max = adjustedMax;
@@ -169,7 +174,9 @@ function traverseFragmentReferences(
       depthsByFragmentReference,
     )) {
       for (const key of Object.keys(depths) as (keyof Depths)[]) {
-        depths[key].current += spec.depthValues[key];
+        if (spec.depthValues[key]) {
+          depths[key]!.current += spec.depthValues[key];
+        }
       }
       resolveFragment(
         fragmentRootByName,
@@ -179,7 +186,9 @@ function traverseFragmentReferences(
         visitedFragments,
       );
       for (const key of Object.keys(depths) as (keyof Depths)[]) {
-        depths[key].current -= spec.depthValues[key];
+        if (spec.depthValues[key]) {
+          depths[key]!.current -= spec.depthValues[key];
+        }
       }
     }
   }
@@ -190,10 +199,15 @@ function resolveOperationRoot(
   operationRoot: OperationRoot,
 ): ResolvedOperation {
   const depths = newDepths();
-  for (const key of Object.keys(depths) as ReadonlyArray<keyof Depths>) {
-    depths[key].max = operationRoot.depths[key].max;
+  for (const key of Object.keys(operationRoot.depths) as ReadonlyArray<
+    keyof Depths
+  >) {
+    if (!depths[key]) {
+      depths[key] = newDepthInfo();
+    }
+    depths[key].max = operationRoot.depths[key]!.max;
     depths[key].coordsByDepth = new Map(
-      operationRoot.depths[key].coordsByDepth,
+      operationRoot.depths[key]!.coordsByDepth,
     );
   }
   traverseFragmentReferences(
@@ -238,6 +252,10 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         `DepthVisitor attempted to increment depth, but there's no currentRoot!`,
       );
     }
+    if (!currentRoot.depths[key]) {
+      // assert(key.includes('.'));
+      currentRoot.depths[key] = newDepthInfo();
+    }
     currentRoot.depths[key].current++;
     const { current, max } = currentRoot.depths[key];
     if (current > max) {
@@ -255,7 +273,12 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
   function decDepth<TKey extends keyof Depths>(key: TKey) {
     if (!currentRoot) {
       throw new Error(
-        `DepthVisitor attempted to increment depth, but there's no currentRoot!`,
+        `DepthVisitor attempted to decrement depth, but there's no currentRoot!`,
+      );
+    }
+    if (!currentRoot.depths[key]) {
+      throw new Error(
+        `DepthVisitor attempted to decrement depth, but the matching key doesn't exist!`,
       );
     }
     currentRoot.depths[key].current--;
@@ -271,10 +294,47 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
       },
       leave(node) {
         // Finalize depths by applying all the fragment depths to the operations
-        const resolvedOperation = resolveRoots(state);
+        const resolvedOperations = resolveRoots(state);
+        const resolvedPreset = context.getResolvedPreset();
 
         // Report the errors
-        console.dir(resolvedOperation, { depth: 4 });
+        for (const resolvedOperation of resolvedOperations) {
+          const operationName = resolvedOperation.name;
+          const config: GraphileConfig.OpcheckRuleConfig = {
+            // Defaults
+            maxDepth: 12,
+            maxListDepth: 4,
+            maxSelfReferentialDepth: 2,
+            maxIntrospectionDepth: 12,
+            maxIntrospectionListDepth: 3,
+            maxIntrospectionSelfReferentialDepth: 2,
+            maxDepthByFieldCoordinates: Object.create(null),
+
+            // Global configuration
+            ...resolvedPreset.opcheck?.config,
+
+            // Override for this operation
+            ...(operationName
+              ? resolvedPreset.opcheck?.operationOverrides?.[operationName]
+              : null),
+          };
+          const { maxDepthByFieldCoordinates: userMaxDepthByFieldCoordinates } =
+            config;
+          const maxDepthByFieldCoordinates = {
+            "Query.__schema": 1,
+            "Query.__type": 1,
+            "__Type.fields": 1,
+            "__Type.inputFields": 1,
+            "__Type.interfaces": 1,
+            "__Type.ofType": 8,
+            "__Type.possibleTypes": 1,
+            "__Field.args": 1,
+            "__Field.type": 1,
+            ...userMaxDepthByFieldCoordinates,
+          };
+          console.dir(maxDepthByFieldCoordinates);
+          console.dir(resolvedOperation, { depth: 4 });
+        }
 
         // Clean up
         state.complete = true;
@@ -346,10 +406,13 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
     },
     Field: {
       enter(node) {
-        const type = context.getType();
-        if (!type) return;
-        const { namedType, listDepth } = processType(type);
+        const returnType = context.getType();
+        if (!returnType) return;
+        const parentType = context.getParentType();
+        if (!parentType) return;
+        const { namedType, listDepth } = processType(returnType);
         if (isCompositeType(namedType)) {
+          incDepth(`${parentType.name}.${node.name.value}`);
           incDepth(
             context.isIntrospection() ? "introspectionFields" : "fields",
           );
@@ -361,10 +424,13 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         }
       },
       leave(node) {
-        const type = context.getType();
-        if (!type) return;
-        const { namedType, listDepth } = processType(type);
+        const returnType = context.getType();
+        if (!returnType) return;
+        const parentType = context.getParentType();
+        if (!parentType) return;
+        const { namedType, listDepth } = processType(returnType);
         if (isCompositeType(namedType)) {
+          decDepth(`${parentType.name}.${node.name.value}`);
           decDepth(
             context.isIntrospection() ? "introspectionFields" : "fields",
           );
