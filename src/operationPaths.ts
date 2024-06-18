@@ -59,16 +59,36 @@ export function visitWithTypeInfoEnhanced(
 
 export class TypeAndOperationPathInfo extends TypeInfo {
   operationPathParts: string[] = [];
+  _introspectionDepth = 0;
+
   enter(node: ASTNode) {
     this.enterOperationPath(node);
+    if (
+      node.kind === Kind.FRAGMENT_DEFINITION &&
+      node.typeCondition.name.value.startsWith("__")
+    ) {
+      this._introspectionDepth++;
+    } else if (node.kind === Kind.FIELD && node.name.value.startsWith("__")) {
+      this._introspectionDepth++;
+    }
     const result = super.enter(node);
     return result;
   }
+
   leave(node: ASTNode) {
     const result = super.leave(node);
+    if (
+      node.kind === Kind.FRAGMENT_DEFINITION &&
+      node.typeCondition.name.value.startsWith("__")
+    ) {
+      this._introspectionDepth--;
+    } else if (node.kind === Kind.FIELD && node.name.value.startsWith("__")) {
+      this._introspectionDepth--;
+    }
     this.leaveOperationPath(node);
     return result;
   }
+
   enterOperationPath(node: ASTNode) {
     switch (node.kind) {
       case Kind.SELECTION_SET: {
@@ -147,6 +167,7 @@ export class TypeAndOperationPathInfo extends TypeInfo {
     }
     // console.log(node.kind + ": " + this.operationPathParts.join(""));
   }
+
   leaveOperationPath(node: ASTNode) {
     switch (node.kind) {
       case Kind.SELECTION_SET: {
@@ -191,5 +212,9 @@ export class TypeAndOperationPathInfo extends TypeInfo {
 
   getOperationPath() {
     return this.operationPathParts.join("");
+  }
+
+  isIntrospection() {
+    return this._introspectionDepth > 0;
   }
 }

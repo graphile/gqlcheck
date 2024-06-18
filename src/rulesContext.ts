@@ -18,4 +18,7 @@ export class RulesContext extends ValidationContext {
   getResolvedPreset() {
     return this.resolvedPreset;
   }
+  isIntrospection() {
+    return this.typeInfo.isIntrospection();
+  }
 }

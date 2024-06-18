@@ -350,9 +350,13 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         if (!type) return;
         const { namedType, listDepth } = processType(type);
         if (isCompositeType(namedType)) {
-          incDepth("fields");
+          incDepth(
+            context.isIntrospection() ? "introspectionFields" : "fields",
+          );
           for (let i = 0; i < listDepth; i++) {
-            incDepth("lists");
+            incDepth(
+              context.isIntrospection() ? "introspectionLists" : "lists",
+            );
           }
         }
       },
@@ -361,9 +365,13 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         if (!type) return;
         const { namedType, listDepth } = processType(type);
         if (isCompositeType(namedType)) {
-          decDepth("fields");
+          decDepth(
+            context.isIntrospection() ? "introspectionFields" : "fields",
+          );
           for (let i = 0; i < listDepth; i++) {
-            decDepth("lists");
+            decDepth(
+              context.isIntrospection() ? "introspectionLists" : "lists",
+            );
           }
         }
       },
