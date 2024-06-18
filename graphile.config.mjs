@@ -5,7 +5,7 @@
 /** @type {GraphileConfig.Preset} */
 const preset = {
   opcheck: {
-    schemaSdlPath: "__tests__/schema.graphql",
+    schemaSdlPath: "__tests__/schema.graphqls",
   },
 };
 export default preset;

@@ -5,7 +5,6 @@ import {
   CheckDocumentRequest,
   CheckDocumentResult,
   WorkerData,
-  Issue,
   SourceLike,
   Results,
 } from "./interfaces";
@@ -211,6 +210,7 @@ export async function checkOperations(
   releaseWorkers();
 
   return {
+    // TODO: counters: documents, operations, fragments, fields, arguments
     results,
   };
 

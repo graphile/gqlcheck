@@ -1,4 +1,4 @@
-import { GraphQLFormattedError } from "graphql";
+import { GraphQLFormattedError, ValidationContext } from "graphql";
 
 export interface WorkerData {
   configPath: string | null | undefined;

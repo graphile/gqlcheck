@@ -2,11 +2,16 @@ import { isMainThread, parentPort, workerData } from "node:worker_threads";
 import { readFileSync } from "node:fs";
 import {
   buildASTSchema,
+  GraphQLError,
   Kind,
   parse,
   Source,
+  TypeInfo,
   validate,
   validateSchema,
+  visit,
+  visitInParallel,
+  visitWithTypeInfo,
 } from "graphql";
 import {
   CheckDocumentOperationResult,
@@ -16,6 +21,10 @@ import {
 } from "./interfaces";
 import { loadConfig } from "graphile-config/load";
 import { resolvePresets } from "graphile-config";
+import { TypeAndOperationPathInfo } from "./operationPaths";
+import { RulesContext } from "./rulesContext";
+import { DepthVisitor } from "./DepthVisitor";
+import { RuleError } from "./ruleError";
 
 if (isMainThread) {
   throw new Error(
@@ -34,8 +43,9 @@ async function main() {
   const { configPath } = workerData as WorkerData;
   const rawConfig = await loadConfig(configPath);
   const config = rawConfig ? resolvePresets([rawConfig]) : {};
-  const { opcheck: { schemaSdlPath = `${process.cwd()}/schema.sdl` } = {} } =
-    config;
+  const {
+    opcheck: { schemaSdlPath = `${process.cwd()}/schema.graphql` } = {},
+  } = config;
 
   const schemaString = readFileSync(schemaSdlPath, "utf8");
   const schema = buildASTSchema(parse(schemaString));
@@ -77,13 +87,28 @@ async function main() {
       };
     }
 
+    const typeInfo = new TypeAndOperationPathInfo(schema);
+    const errors: RuleError[] = [];
+    function onError(error: RuleError) {
+      errors.push(error);
+    }
+    const rulesContext = new RulesContext(schema, document, typeInfo, onError);
+    const visitor = visitInParallel([DepthVisitor(rulesContext)]);
+    visit(document, visitWithTypeInfo(typeInfo, visitor));
+
     const operations = operationDefinitions.map(
       (operationDefinition): CheckDocumentOperationResult => {
         const operationName = operationDefinition.name?.value;
         const operationKind = operationDefinition.operation;
 
         /*
-      const { depths } = countDepth(schema, operation, fragments, {});
+        const { depths } = countDepth(
+          schema,
+          operationDefinition,
+          fragmentDefinitions,
+          { revealDetails: true },
+        );
+
 
       const maxes: Record<
         string,
@@ -139,7 +164,7 @@ async function main() {
 
     return {
       sourceName,
-      errors: [],
+      errors,
       operations,
     };
   }

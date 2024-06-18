@@ -1,3 +1,70 @@
 query Test000001 {
-  mol
+  allPeople {
+    edges {
+      cursor
+      node {
+        ...PersonDetails
+        leftArm: leftArmByPersonId {
+          nodeId
+          id
+          personId
+          personByPersonId {
+            ...PersonDetails
+          }
+          lengthInMetres
+        }
+        secret: personSecretByPersonId {
+          nodeId
+          personId
+          personByPersonId {
+            ...PersonDetails
+          }
+          secret
+        }
+      }
+    }
+  }
+
+  queryOutputTwoRowsNeitherExist: queryOutputTwoRows(
+    leftArmId: 999999999
+    postId: 999999999
+    txt: "Don't fail me now..."
+  ) {
+    ...OutputTwoRowsFragment
+  }
+}
+
+fragment OutputTwoRowsFragment on QueryOutputTwoRowsRecord {
+  leftArm {
+    id
+    lengthInMetres
+    mood
+    personByPersonId {
+      name
+      personSecretByPersonId {
+        secret
+      }
+    }
+  }
+  l2: leftArm {
+    personId
+  }
+  post {
+    id
+    headline
+    authorId
+    personByAuthorId {
+      name
+      personSecretByPersonId {
+        secret
+      }
+    }
+  }
+  txt
+}
+
+fragment PersonDetails on Person {
+  id
+  name
+  firstName
 }

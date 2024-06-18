@@ -1,2 +1,2 @@
 KJSONL000001: "query KJSONL000001 { __typename }"
-KJSONL000002: "query KJSONL000002 { typeGnome }"
+KJSONL000002: "query KJSONL000002 { query { query { query { query { query { query { query { nodeId } } } } } } } }"
