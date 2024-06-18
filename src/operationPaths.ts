@@ -80,8 +80,13 @@ export class TypeAndOperationPathInfo extends TypeInfo {
         const alias = node.alias?.value;
         const namedType = getNamedType(this.getType());
         const typeName = namedType ? namedType.name : "???";
+        const join = this.operationPathParts[
+          this.operationPathParts.length - 1
+        ].endsWith(".")
+          ? ""
+          : ">";
         this.operationPathParts.push(
-          `>${alias ? `${alias}:` : ""}${typeName}.${fieldName}`,
+          `${join}${alias ? `${alias}:` : ""}${fieldName}`,
         );
         break;
       }

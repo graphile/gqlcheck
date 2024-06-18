@@ -126,9 +126,7 @@ function resolveFragment(
         depths[key].max = adjustedMax;
       }
       for (const [fragDepth, fragCoords] of fragCoordsByDepth) {
-        const transformedCoords = fragCoords.map(
-          (c) => `${operationPath}>${c}`,
-        );
+        const transformedCoords = fragCoords.map((c) => `${operationPath}${c}`);
         const depth = depths[key].current + fragDepth;
         const list = depths[key].coordsByDepth.get(depth);
         if (list) {
@@ -144,6 +142,7 @@ function resolveFragment(
     traverseFragmentReferences(
       fragmentRootByName,
       depths,
+      operationPath,
       fragmentRoot.fragmentReferences,
       visitedFragments,
     );
@@ -159,6 +158,7 @@ function resolveFragment(
 function traverseFragmentReferences(
   fragmentRootByName: Record<string, FragmentRoot>,
   depths: Depths,
+  basePath: string,
   fragmentReferences: IRoot["fragmentReferences"],
   visitedFragments: string[],
 ): void {
@@ -174,7 +174,7 @@ function traverseFragmentReferences(
       resolveFragment(
         fragmentRootByName,
         depths,
-        operationPath,
+        basePath + operationPath + ">",
         fragmentName,
         visitedFragments,
       );
@@ -199,6 +199,7 @@ function resolveOperationRoot(
   traverseFragmentReferences(
     fragmentRootByName,
     depths,
+    "",
     operationRoot.fragmentReferences,
     [],
   );
@@ -250,6 +251,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         .push(context.getOperationPath());
     }
   }
+
   function decDepth<TKey extends keyof Depths>(key: TKey) {
     if (!currentRoot) {
       throw new Error(
@@ -258,6 +260,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
     }
     currentRoot.depths[key].current--;
   }
+
   return {
     Document: {
       enter(node) {
