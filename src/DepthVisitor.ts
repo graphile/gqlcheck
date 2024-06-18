@@ -398,8 +398,6 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
               }
             })();
             if (max > limit) {
-              // Uh-oh!
-              console.log(`Uh-oh! ${max} > ${limit}`);
               const operationCoordinates: string[] = [];
               for (let i = limit + 1; i <= max; i++) {
                 coordsByDepth

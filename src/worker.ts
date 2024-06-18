@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   buildASTSchema,
   GraphQLError,
+  GraphQLFormattedError,
   Kind,
   parse,
   Source,
@@ -17,6 +18,7 @@ import {
   CheckDocumentOperationResult,
   CheckDocumentRequest,
   CheckDocumentResult,
+  RuleFormattedError,
   WorkerData,
 } from "./interfaces";
 import { loadConfig } from "graphile-config/load";
@@ -88,9 +90,9 @@ async function main() {
     }
 
     const typeInfo = new TypeAndOperationPathInfo(schema);
-    const errors: RuleError[] = [];
-    function onError(error: RuleError) {
-      errors.push(error);
+    const errors: (RuleFormattedError | GraphQLFormattedError)[] = [];
+    function onError(error: RuleError | GraphQLError) {
+      errors.push(error.toJSON());
     }
     const rulesContext = new RulesContext(
       schema,

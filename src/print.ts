@@ -1,5 +1,5 @@
 import { GraphQLFormattedError } from "graphql";
-import { Issue, Results } from "./interfaces.js";
+import { Issue, Results, RuleFormattedError } from "./interfaces.js";
 
 function printGraphQLFormattedErrorLocations(
   error: GraphQLFormattedError,
@@ -14,6 +14,9 @@ function printGraphQLFormattedErrorLocations(
 
 function printGraphQLFormattedError(error: GraphQLFormattedError) {
   return `${printGraphQLFormattedErrorLocations(error)}${error.message}`;
+}
+function printRuleFormattedError(error: RuleFormattedError) {
+  return `${printGraphQLFormattedErrorLocations(error)}${error.message}\nProblematic paths:\n- ${error.operationCoordinates.slice(0, 10).join("\n- ")}${error.operationCoordinates.length > 10 ? "\n- ..." : ""}`;
 }
 
 function printIssue(
@@ -48,7 +51,11 @@ export function printResults(results: Results, detailed = false) {
       const items: string[] = [];
       if (result.errors) {
         for (const error of result.errors) {
-          items.push(printGraphQLFormattedError(error));
+          if ("ruleName" in error) {
+            items.push(printRuleFormattedError(error));
+          } else {
+            items.push(printGraphQLFormattedError(error));
+          }
         }
       }
       if (result.operations) {

@@ -1,4 +1,9 @@
-import { DocumentNode, GraphQLSchema, ValidationContext } from "graphql";
+import {
+  DocumentNode,
+  GraphQLError,
+  GraphQLSchema,
+  ValidationContext,
+} from "graphql";
 import { TypeAndOperationPathInfo } from "./operationPaths";
 import { RuleError } from "./ruleError";
 
@@ -8,9 +13,9 @@ export class RulesContext extends ValidationContext {
     ast: DocumentNode,
     private typeInfo: TypeAndOperationPathInfo,
     private resolvedPreset: GraphileConfig.ResolvedPreset,
-    onError: (error: RuleError) => void,
+    onError: (error: RuleError | GraphQLError) => void,
   ) {
-    super(schema, ast, typeInfo, onError);
+    super(schema, ast, typeInfo, (error) => onError(error));
   }
   getOperationPath() {
     return this.typeInfo.getOperationPath();
