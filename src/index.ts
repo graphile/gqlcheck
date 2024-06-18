@@ -6,9 +6,10 @@ declare global {
       opcheck?: {
         workerCount?: number;
         schemaSdlPath?: string;
-        overrides?: {
-          [coordinate: string]: GraphileConfig.OpcheckRuleConfig;
+        operationOverrides?: {
+          [operationName: string]: GraphileConfig.OpcheckRuleConfig;
         };
+        config?: GraphileConfig.OpcheckRuleConfig;
       };
     }
     interface OpcheckRuleConfig {

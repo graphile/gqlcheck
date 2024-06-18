@@ -92,7 +92,13 @@ async function main() {
     function onError(error: RuleError) {
       errors.push(error);
     }
-    const rulesContext = new RulesContext(schema, document, typeInfo, onError);
+    const rulesContext = new RulesContext(
+      schema,
+      document,
+      typeInfo,
+      config,
+      onError,
+    );
     const visitor = visitInParallel([DepthVisitor(rulesContext)]);
     visit(document, visitWithTypeInfo(typeInfo, visitor));
 
