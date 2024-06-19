@@ -24,7 +24,7 @@ export interface CheckDocumentOperationResult {
 export interface Issue {
   lineNumber: number;
   columnNumber: number;
-  ruleName: string;
+  infraction: string;
   operationCoordinate: string;
   /** What needs to be added to the overrides for this coordinate for this error to be ignored? */
   override: {};
@@ -47,7 +47,7 @@ export interface SourceResultsBySourceName {
 }
 
 export interface RuleFormattedError extends GraphQLFormattedError {
-  ruleName: string;
+  infraction: string;
   operationName: string | undefined;
   operationCoordinates: string[];
   override: GraphileConfig.OpcheckRuleConfig;
@@ -63,7 +63,7 @@ export interface Baseline {
     [operationName: string]:
       | {
           ignoreCoordinatesByRule: {
-            [ruleName: string]: string[] | undefined;
+            [infraction: string]: string[] | undefined;
           };
         }
       | undefined;

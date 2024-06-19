@@ -344,10 +344,10 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
           for (const key of Object.keys(resolvedOperation.depths)) {
             const { max, coordsByDepth } = resolvedOperation.depths[key]!;
             const selfReferential = key.includes(".");
-            const [limit, override, ruleName, label] = ((): [
+            const [limit, override, infraction, label] = ((): [
               limit: number,
               override: GraphileConfig.OpcheckRuleConfig,
-              ruleName: string,
+              infraction: string,
               label: string,
             ] => {
               if (selfReferential) {
@@ -411,7 +411,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
               const error = new RuleError(
                 `${label} exceeded: ${max} > ${limit}`,
                 {
-                  ruleName,
+                  infraction,
                   operationName,
                   operationCoordinates,
                   override,

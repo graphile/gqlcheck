@@ -2,7 +2,7 @@ import { GraphQLError, GraphQLErrorOptions } from "graphql";
 import { RuleFormattedError } from "./interfaces";
 
 export interface RuleErrorOptions extends GraphQLErrorOptions {
-  ruleName: string;
+  infraction: string;
   operationName: string | undefined;
   operationCoordinates: string[];
   /** What needs to be added to the overrides for this coordinate for this error to be ignored? */
@@ -19,7 +19,7 @@ export class RuleError extends GraphQLError {
   toJSON(): RuleFormattedError {
     return {
       ...super.toJSON(),
-      ruleName: this.options.ruleName,
+      infraction: this.options.infraction,
       operationName: this.options.operationName,
       operationCoordinates: this.options.operationCoordinates,
       override: this.options.override,

@@ -14,9 +14,9 @@ export function generateBaseline(result: CheckOperationsResult): Baseline {
   )) {
     const { errors } = output;
     for (const error of errors) {
-      if ("ruleName" in error) {
+      if ("infraction" in error) {
         // Rule error
-        const { operationName, ruleName, operationCoordinates } = error;
+        const { operationName, infraction, operationCoordinates } = error;
         if (!operationName) continue;
         if (!baseline.operations[operationName]) {
           baseline.operations[operationName] = {
@@ -24,10 +24,10 @@ export function generateBaseline(result: CheckOperationsResult): Baseline {
           };
         }
         const op = baseline.operations[operationName];
-        if (!op.ignoreCoordinatesByRule[ruleName]) {
-          op.ignoreCoordinatesByRule[ruleName] = [];
+        if (!op.ignoreCoordinatesByRule[infraction]) {
+          op.ignoreCoordinatesByRule[infraction] = [];
         }
-        const ignores = op.ignoreCoordinatesByRule[ruleName];
+        const ignores = op.ignoreCoordinatesByRule[infraction];
         for (const coord of operationCoordinates) {
           ignores.push(coord);
         }
@@ -46,8 +46,12 @@ function filterOutput(
 
   const errors = rawErrors
     .map((e) => {
-      if ("ruleName" in e) {
-        const { ruleName, operationName, operationCoordinates: rawCoords } = e;
+      if ("infraction" in e) {
+        const {
+          infraction,
+          operationName,
+          operationCoordinates: rawCoords,
+        } = e;
         if (!operationName) {
           return e;
         }
@@ -55,7 +59,9 @@ function filterOutput(
           return e;
         }
         const ignores =
-          baseline.operations[operationName].ignoreCoordinatesByRule[ruleName];
+          baseline.operations[operationName].ignoreCoordinatesByRule[
+            infraction
+          ];
         if (!ignores) {
           return e;
         }

@@ -36,11 +36,11 @@ function printIssue(
     lineNumber,
     columnNumber,
     message,
-    ruleName,
+    infraction,
     details,
     operationCoordinate,
   } = issue;
-  const base = `[${lineNumber}:${columnNumber}@${operationCoordinate}] ${message} (${ruleName})`;
+  const base = `[${lineNumber}:${columnNumber}@${operationCoordinate}] ${message} (${infraction})`;
   if (detailed && details) {
     return base + "\n" + details;
   } else {
@@ -57,7 +57,7 @@ export function printResults(result: CheckOperationsResult, detailed = false) {
       const items: string[] = [];
       if (output.errors) {
         for (const error of output.errors) {
-          if ("ruleName" in error) {
+          if ("infraction" in error) {
             items.push(printRuleFormattedError(error));
           } else {
             items.push(printGraphQLFormattedError(error));
