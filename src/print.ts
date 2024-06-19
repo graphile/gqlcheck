@@ -1,10 +1,5 @@
 import { GraphQLFormattedError } from "graphql";
-import {
-  Issue,
-  SourceResultsBySourceName,
-  RuleFormattedError,
-  CheckOperationsResult,
-} from "./interfaces.js";
+import { RuleFormattedError, CheckOperationsResult } from "./interfaces.js";
 
 function printGraphQLFormattedErrorLocations(
   error: GraphQLFormattedError,
@@ -24,30 +19,6 @@ function printRuleFormattedError(error: RuleFormattedError) {
   return `${printGraphQLFormattedErrorLocations(error)}${error.message}\nProblematic paths:\n- ${error.operationCoordinates.slice(0, 10).join("\n- ")}${error.operationCoordinates.length > 10 ? "\n- ..." : ""}`;
 }
 
-function printIssue(
-  issue: Issue,
-  op: {
-    operationName: string | undefined;
-    operationKind: "query" | "mutation" | "subscription";
-  },
-  detailed: boolean,
-) {
-  const {
-    lineNumber,
-    columnNumber,
-    message,
-    infraction,
-    details,
-    operationCoordinate,
-  } = issue;
-  const base = `[${lineNumber}:${columnNumber}@${operationCoordinate}] ${message} (${infraction})`;
-  if (detailed && details) {
-    return base + "\n" + details;
-  } else {
-    return base;
-  }
-}
-
 export function printResults(result: CheckOperationsResult, detailed = false) {
   const results = result.resultsBySourceName;
   const parts = Object.entries(results)
@@ -61,15 +32,6 @@ export function printResults(result: CheckOperationsResult, detailed = false) {
             items.push(printRuleFormattedError(error));
           } else {
             items.push(printGraphQLFormattedError(error));
-          }
-        }
-      }
-      if (output.operations) {
-        // What if we have fragment rules? Should it always be operation-centric?
-        for (const op of output.operations) {
-          const { operationKind, operationName, issues } = op;
-          for (const issue of issues) {
-            items.push(printIssue(issue, op, detailed));
           }
         }
       }

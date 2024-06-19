@@ -185,9 +185,9 @@ export async function checkOperations(
   const operationKindByOperationName = new Map<string, string>();
   for (const { request, result } of allResults) {
     const { sourceName, sourceString } = request;
-    const { errors, operations } = result;
+    const { operations } = result;
     for (const operation of operations) {
-      const { operationName, operationKind, issues } = operation;
+      const { operationName, operationKind } = operation;
       if (!operationName) continue;
       debug(`%s: %s %s`, sourceName, operationKind, operationName);
       const expectedOperationKind =
@@ -214,37 +214,4 @@ export async function checkOperations(
     // TODO: counters: documents, operations, fragments, fields, arguments
     resultsBySourceName: results,
   };
-
-  /*
-  const MAX_DEPTH = 10;
-  const MAX_LIST_DEPTH = 3;
-  for (const [operationName, results] of Object.entries(
-    resultsByOperationName,
-  )) {
-    const overrides = Object.create(null) as {
-      maxDepth?: number;
-      maxListDepth?: number;
-    };
-    if (results.maxDepth > MAX_DEPTH) {
-      overrides.maxDepth = results.maxDepth;
-    }
-    if (results.maxListDepth > MAX_LIST_DEPTH) {
-      overrides.maxListDepth = results.maxListDepth;
-    }
-    if (Object.keys(overrides).length > 0) {
-      console.log(`${operationName}: ${JSON.stringify(overrides)}`);
-    }
-  }
-
-  if (failed.length > 0) {
-    console.error("The following queries failed:");
-    for (const { request, result } of failed) {
-      console.error(`- ${request.sourceName} (${result.operationName}):`);
-      for (const error of result.errors) {
-        console.error(`  ` + String(error).replace(/\n/g, "\n  "));
-      }
-    }
-    process.exitCode = 3;
-  }
-  */
 }

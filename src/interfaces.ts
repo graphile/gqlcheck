@@ -1,4 +1,4 @@
-import { GraphQLFormattedError, ValidationContext } from "graphql";
+import { GraphQLFormattedError } from "graphql";
 
 export interface WorkerData {
   configPath: string | null | undefined;
@@ -18,20 +18,6 @@ export interface CheckDocumentOutput {
 export interface CheckDocumentOperationResult {
   operationName: string | undefined;
   operationKind: "query" | "mutation" | "subscription";
-  issues: ReadonlyArray<Issue>;
-}
-
-export interface Issue {
-  lineNumber: number;
-  columnNumber: number;
-  infraction: string;
-  operationCoordinate: string;
-  /** What needs to be added to the overrides for this coordinate for this error to be ignored? */
-  override: {};
-  /** e.g. "Depth 12 exceeds maximum depth 8" */
-  message: string;
-  /** e.g. `Paths:\n- allFoo>nodes>bars>qu>...\n- allBars>nodes>...` */
-  details?: string;
 }
 
 export interface SourceLike {

@@ -7,7 +7,6 @@ import {
   Kind,
   parse,
   Source,
-  TypeInfo,
   validate,
   validateSchema,
   visit,
@@ -68,9 +67,6 @@ async function main() {
     const operationDefinitions = document.definitions.filter(
       (o) => o.kind === Kind.OPERATION_DEFINITION,
     );
-    const fragmentDefinitions = document.definitions.filter(
-      (d) => d.kind === "FragmentDefinition",
-    );
     if (operationDefinitions.length === 0) {
       return {
         sourceName,
@@ -109,63 +105,9 @@ async function main() {
         const operationName = operationDefinition.name?.value;
         const operationKind = operationDefinition.operation;
 
-        /*
-        const { depths } = countDepth(
-          schema,
-          operationDefinition,
-          fragmentDefinitions,
-          { revealDetails: true },
-        );
-
-
-      const maxes: Record<
-        string,
-        {
-          val: number;
-          operations: Array<{
-            sourceName: string;
-            operationName: string | undefined;
-            sourceString: string;
-          }>;
-        }
-      > = Object.create(null);
-
-      if (depths) {
-        if (depths.$$depth) {
-          operationResult.maxDepthByHash[sourceName] = depths.$$depth;
-          if (depths.$$depth > operationResult.maxDepth) {
-            operationResult.maxDepth = depths.$$depth;
-          }
-        }
-        if (depths.$$listDepth) {
-          operationResult.maxListDepthByHash[sourceName] = depths.$$listDepth;
-          if (depths.$$listDepth > operationResult.maxListDepth) {
-            operationResult.maxListDepth = depths.$$listDepth;
-          }
-        }
-        for (const [desc, key] of Object.entries(KEYS)) {
-          const val = depths[key];
-          if (val != null) {
-            if (!maxes[key] || val > maxes[key].val) {
-              maxes[key] = {
-                val,
-                operations: [{ sourceName, operationName, sourceString }],
-              };
-            } else if (val === maxes[key].val) {
-              maxes[key].operations.push({
-                sourceName,
-                operationName,
-                sourceString,
-              });
-            }
-          }
-        }
-      }
-      */
         return {
           operationName,
           operationKind,
-          issues: [],
         };
       },
     );

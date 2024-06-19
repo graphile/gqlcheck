@@ -42,7 +42,7 @@ function filterOutput(
   baseline: Baseline,
   output: CheckDocumentOutput,
 ): CheckDocumentOutput {
-  const { operations, errors: rawErrors, sourceName } = output;
+  const { errors: rawErrors } = output;
 
   const errors = rawErrors
     .map((e) => {
@@ -84,8 +84,6 @@ function filterOutput(
 
   return {
     ...output,
-    operations,
-    sourceName,
     errors,
   };
 }

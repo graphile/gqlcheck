@@ -1,61 +1,11 @@
 import * as assert from "node:assert";
 import {
-  ASTVisitor,
   Kind,
   TypeInfo,
-  getEnterLeaveForKind,
   getNamedType,
   getNullableType,
-  isNamedType,
+  ASTNode,
 } from "graphql";
-import { ASTNode, isNode } from "graphql/language/ast";
-
-/*
-export function visitWithTypeInfoEnhanced(
-  typeInfo: TypeInfo,
-  visitor: ASTVisitor,
-): ASTVisitor {
-  const operationPathInfo = new OperationPathInfo();
-  return {
-    enter(...args) {
-      const node = args[0];
-      typeInfo.enter(node);
-      operationPathInfo.enter(node, typeInfo);
-      const fn = getEnterLeaveForKind(visitor, node.kind).enter;
-
-      if (fn) {
-        const result = fn.apply(visitor, args);
-
-        if (result !== undefined) {
-          operationPathInfo.leave(node, typeInfo);
-          typeInfo.leave(node);
-
-          if (isNode(result)) {
-            typeInfo.enter(result);
-            operationPathInfo.enter(result, typeInfo);
-          }
-        }
-
-        return result;
-      }
-    },
-
-    leave(...args) {
-      const node = args[0];
-      const fn = getEnterLeaveForKind(visitor, node.kind).leave;
-      let result;
-
-      if (fn) {
-        result = fn.apply(visitor, args);
-      }
-
-      operationPathInfo.leave(node, typeInfo);
-      typeInfo.leave(node);
-      return result;
-    },
-  };
-}
-*/
 
 export class TypeAndOperationPathInfo extends TypeInfo {
   operationPathParts: string[] = [];
@@ -98,8 +48,8 @@ export class TypeAndOperationPathInfo extends TypeInfo {
       case Kind.FIELD: {
         const fieldName = node.name.value;
         const alias = node.alias?.value;
-        const namedType = getNamedType(this.getType());
-        const typeName = namedType ? namedType.name : "???";
+        //const namedType = getNamedType(this.getType());
+        //const typeName = namedType ? namedType.name : "???";
         const join = this.operationPathParts[
           this.operationPathParts.length - 1
         ].endsWith(".")
