@@ -7,7 +7,6 @@
         {
           operationName: 'F',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -34,7 +33,6 @@
         {
           operationName: 'FoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -61,7 +59,6 @@
         {
           operationName: 'FoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -88,7 +85,6 @@
         {
           operationName: 'FoFoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -115,7 +111,6 @@
         {
           operationName: 'FoFoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -128,7 +123,6 @@
         {
           operationName: 'FoFoFoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -141,7 +135,6 @@
         {
           operationName: 'FoFoFoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -166,7 +159,6 @@
         {
           operationName: 'FoFoFoFoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -191,7 +183,6 @@
         {
           operationName: 'FoFoFoFoFoF',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -300,7 +291,6 @@
         {
           operationName: 'Self10',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -325,7 +315,6 @@
         {
           operationName: 'Self10',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -338,7 +327,6 @@
         {
           operationName: 'Self9',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -351,7 +339,6 @@
         {
           operationName: 'Self9',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -376,7 +363,6 @@
         {
           operationName: 'SelfOtherSelf5',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },

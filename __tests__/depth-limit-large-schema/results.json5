@@ -7,7 +7,6 @@
         {
           operationName: 'TestDirectivesAdditional',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -20,7 +19,6 @@
         {
           operationName: 'TestDirectivesFragments',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -33,7 +31,6 @@
         {
           operationName: 'TestDirectives',
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
@@ -46,7 +43,6 @@
         {
           operationName: 'CreateMutation',
           operationKind: 'mutation',
-          issues: [],
         },
       ],
     },
@@ -58,7 +54,6 @@
       operations: [
         {
           operationKind: 'mutation',
-          issues: [],
         },
       ],
     },
@@ -70,7 +65,6 @@
       operations: [
         {
           operationKind: 'mutation',
-          issues: [],
         },
       ],
     },
@@ -82,7 +76,6 @@
       operations: [
         {
           operationKind: 'mutation',
-          issues: [],
         },
       ],
     },
@@ -94,7 +87,6 @@
       operations: [
         {
           operationKind: 'query',
-          issues: [],
         },
       ],
     },
