@@ -4,6 +4,7 @@ export {
   CheckOperationsResult,
 } from "./interfaces.js";
 export { checkOperations } from "./main.js";
+export { printResults } from "./print.js";
 
 declare global {
   namespace GraphileConfig {

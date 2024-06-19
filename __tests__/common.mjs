@@ -4,6 +4,7 @@ import { diff } from "jest-diff";
 import assert from "assert";
 import { readdir, readFile, writeFile } from "fs/promises";
 import JSON5 from "json5";
+import { printResults } from "../dist/index.js";
 
 /** @import { SourceLike, CheckOperationsResult } from '../dist/index.js' */
 
@@ -19,6 +20,7 @@ export async function getDirHelpers(dirname) {
   const documentsDir = `${dirname}/documents`;
   const configPath = `${dirname}/graphile.config.mjs`;
   const resultsFile = `${dirname}/results.json5`;
+  const outputFile = `${dirname}/output.ansi`;
   const files = (await readdir(documentsDir)).filter((f) =>
     f.endsWith(".graphql"),
   );
@@ -41,42 +43,69 @@ export async function getDirHelpers(dirname) {
       }
     },
     async checkResult(result) {
-      // Sort the results by key
-      const results = Object.fromEntries(
-        Object.entries(result.resultsBySourceName)
-          .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
-          .map(([k, { sourceString, ...rest }]) => [k, rest]),
-      );
-      const stringifiedResults = JSON5.stringify(results, null, 2) + "\n";
-      /** @type { string | null} */
-      let rawJson5;
-      try {
-        rawJson5 = await readFile(resultsFile, "utf8");
-      } catch (e) {
-        rawJson5 = null;
-      }
-      /** @type {(fileExisted: boolean) => Promise<void>} */
-      async function writeSnapshot(fileExisted) {
-        if (fileExisted && UPDATE_SNAPSHOTS) {
-          console.warn(`Updated snapshot in ${resultsFile}`);
-        } else if (!fileExisted) {
-          console.warn(`Created snapshot ${resultsFile}`);
+      {
+        // Sort the results by key
+        const results = Object.fromEntries(
+          Object.entries(result.resultsBySourceName)
+            .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
+            .map(([k, { sourceString, ...rest }]) => [k, rest]),
+        );
+        const stringifiedResults = JSON5.stringify(results, null, 2) + "\n";
+        /** @type { string | null} */
+        let rawJson5;
+        try {
+          rawJson5 = await readFile(resultsFile, "utf8");
+        } catch (e) {
+          rawJson5 = null;
         }
-        await writeFile(resultsFile, stringifiedResults);
-      }
-      if (rawJson5 !== null) {
-        if (rawJson5 === stringifiedResults) {
-          // No action necessary
-        } else if (UPDATE_SNAPSHOTS) {
-          await writeSnapshot(true);
+        if (rawJson5 !== null) {
+          if (rawJson5 === stringifiedResults) {
+            // No action necessary
+          } else if (UPDATE_SNAPSHOTS) {
+            await writeSnapshot(resultsFile, stringifiedResults, true);
+          } else {
+            throw new Error(
+              `Results do not match:\n${diff(JSON5.parse(rawJson5), results)}`,
+            );
+          }
         } else {
-          throw new Error(
-            `Results do not match:\n${diff(JSON5.parse(rawJson5), results)}`,
-          );
+          await writeSnapshot(resultsFile, stringifiedResults, false);
         }
-      } else {
-        await writeSnapshot(false);
+      }
+
+      {
+        const output = printResults(result, true);
+        /** @type { string | null} */
+        let expectedOutput;
+        try {
+          expectedOutput = await readFile(outputFile, "utf8");
+        } catch (e) {
+          expectedOutput = null;
+        }
+        if (expectedOutput !== null) {
+          if (expectedOutput === output) {
+            // No action necessary
+          } else if (UPDATE_SNAPSHOTS) {
+            await writeSnapshot(outputFile, output, true);
+          } else {
+            throw new Error(
+              `Results do not match:\n${diff(expectedOutput, output)}`,
+            );
+          }
+        } else {
+          await writeSnapshot(outputFile, output, false);
+        }
       }
     },
   };
+}
+
+/** @type {(filePath: string, data: string, fileExisted: boolean) => Promise<void>} */
+async function writeSnapshot(filePath, data, fileExisted) {
+  if (fileExisted && UPDATE_SNAPSHOTS) {
+    console.warn(`Updated snapshot in ${filePath}`);
+  } else if (!fileExisted) {
+    console.warn(`Created snapshot ${filePath}`);
+  }
+  await writeFile(filePath, data);
 }

@@ -1,0 +1,24 @@
+FoFoF.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 3 > 2
+  Problematic paths:
+  - FoFoF:query>currentUser>friends>friends>friends
+
+FoFoFoF.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 4 > 3
+  Problematic paths:
+  - FoFoFoF:query>currentUser>friends>friends>friends>friends
+
+FoFoFoFoFoF.graphql:
+- Maximum list nesting depth limit exceeded: 6 > 5
+  Problematic paths:
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends
+
+Self10.graphql:
+- Maximum selection depth limit exceeded: 11 > 10
+  Problematic paths:
+  - Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self
+
+SelfOtherSelf5.graphql:
+- Maximum selection depth limit exceeded: 11 > 10
+  Problematic paths:
+  - SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf
