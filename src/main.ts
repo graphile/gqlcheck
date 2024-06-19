@@ -67,9 +67,7 @@ export async function checkOperations(
   overrideConfig?: GraphileConfig.Preset["opcheck"],
 ): Promise<CheckOperationsResult> {
   const rawConfig = await loadConfig(configPath);
-  const config = rawConfig
-    ? resolvePresets([rawConfig, { opcheck: overrideConfig }])
-    : {};
+  const config = resolvePresets([rawConfig ?? {}, { opcheck: overrideConfig }]);
   const { opcheck: { baselinePath, workerCount = os.cpus().length } = {} } =
     config;
   const baseline = await loadBaseline(baselinePath);
