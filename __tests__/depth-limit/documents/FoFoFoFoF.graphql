@@ -1,0 +1,15 @@
+query FoFoFoFoF {
+  currentUser {
+    friends {
+      friends {
+        friends {
+          friends {
+            friends {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}

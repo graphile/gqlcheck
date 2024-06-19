@@ -1,0 +1,14 @@
+# Expect error
+query FoFoFoF {
+  currentUser {
+    friends {
+      friends {
+        friends {
+          friends {
+            name
+          }
+        }
+      }
+    }
+  }
+}

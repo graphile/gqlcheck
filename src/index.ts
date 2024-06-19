@@ -1,4 +1,5 @@
-export { checkOperations } from "./main";
+export { SourceLike, Results } from "./interfaces.js";
+export { checkOperations } from "./main.js";
 
 declare global {
   namespace GraphileConfig {

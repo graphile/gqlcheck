@@ -1,0 +1,12 @@
+# This should generate an error
+query FoFoF {
+  currentUser {
+    friends {
+      friends {
+        friends {
+          name
+        }
+      }
+    }
+  }
+}

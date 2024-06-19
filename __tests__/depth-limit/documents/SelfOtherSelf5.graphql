@@ -1,0 +1,26 @@
+# Expect error
+query SelfOtherSelf5 {
+  currentUser {
+    self {
+      otherSelf {
+        self {
+          otherSelf {
+            self {
+              otherSelf {
+                self {
+                  otherSelf {
+                    self {
+                      otherSelf {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

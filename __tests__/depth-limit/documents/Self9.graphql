@@ -1,0 +1,23 @@
+query Self9 {
+  currentUser {
+    self {
+      self {
+        self {
+          self {
+            self {
+              self {
+                self {
+                  self {
+                    self {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
