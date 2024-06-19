@@ -12,11 +12,8 @@ import {
   Baseline,
 } from "./interfaces";
 import { loadConfig } from "graphile-config/load";
-import debugFactory from "debug";
 import { readFile } from "node:fs/promises";
 import { filterBaseline } from "./baseline";
-
-const debug = debugFactory("gqlcheck");
 
 type Deferred<T> = Promise<T> & {
   resolve: (value: T | PromiseLike<T>) => void;
@@ -227,7 +224,6 @@ export async function checkOperations(
     for (const operation of operations) {
       const { operationName, operationKind } = operation;
       if (!operationName) continue;
-      debug(`%s: %s %s`, sourceName, operationKind, operationName);
       const expectedOperationKind =
         operationKindByOperationName.get(operationName);
       if (!expectedOperationKind) {
