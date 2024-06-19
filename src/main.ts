@@ -1,3 +1,4 @@
+import JSON5 from "json5";
 import { resolvePresets } from "graphile-config";
 import { Worker } from "node:worker_threads";
 import * as os from "node:os";
@@ -8,9 +9,12 @@ import {
   SourceLike,
   SourceResultsBySourceName,
   CheckOperationsResult,
+  Baseline,
 } from "./interfaces";
 import { loadConfig } from "graphile-config/load";
 import debugFactory from "debug";
+import { readFile } from "node:fs/promises";
+import { filterBaseline } from "./baseline";
 
 const debug = debugFactory("opcheck");
 
@@ -31,14 +35,44 @@ function defer<T>(): Deferred<T> {
   );
 }
 
+async function loadBaseline(
+  baselinePath: string | undefined,
+): Promise<Baseline | null> {
+  if (baselinePath == null) {
+    return null;
+  }
+  try {
+    const data = await readFile(baselinePath, "utf8");
+    // TODO: safer casting
+    return JSON5.parse(data) as Baseline;
+  } catch (e) {
+    if (
+      typeof e === "object" &&
+      e != null &&
+      "code" in e &&
+      e.code === "ENOENT"
+    ) {
+      return null;
+    }
+    throw new Error(
+      `Failed to load baseline from configured '${baselinePath}'`,
+      { cause: e },
+    );
+  }
+}
+
 export async function checkOperations(
   getDocuments: () => AsyncIterable<string | SourceLike>,
   configPath?: string,
   overrideConfig?: GraphileConfig.Preset["opcheck"],
 ): Promise<CheckOperationsResult> {
   const rawConfig = await loadConfig(configPath);
-  const config = rawConfig ? resolvePresets([rawConfig]) : {};
-  const { opcheck: { workerCount = os.cpus().length } = {} } = config;
+  const config = rawConfig
+    ? resolvePresets([rawConfig, { opcheck: overrideConfig }])
+    : {};
+  const { opcheck: { baselinePath, workerCount = os.cpus().length } = {} } =
+    config;
+  const baseline = await loadBaseline(baselinePath);
   const workerPromises: Promise<Worker>[] = [];
   const handleError = (_worker: Worker, error: Error) => {
     console.error(`Worker exited with error: ${error}`);
@@ -215,6 +249,9 @@ export async function checkOperations(
 
   return {
     // TODO: counters: documents, operations, fragments, fields, arguments
-    resultsBySourceName: results,
+    rawResultsBySourceName: results,
+    resultsBySourceName: baseline ? filterBaseline(baseline, results) : results,
+    baseline,
+    resolvedPreset: config,
   };
 }

@@ -13,6 +13,7 @@ declare global {
     interface Preset {
       opcheck?: {
         workerCount?: number;
+        baselinePath?: string;
         schemaSdlPath?: string;
         operationOverrides?: {
           [operationName: string]: GraphileConfig.OpcheckRuleConfig;

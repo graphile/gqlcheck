@@ -1,17 +1,17 @@
 import {
   Baseline,
   CheckDocumentOutput,
-  CheckOperationsResult,
+  SourceResultsBySourceName,
 } from "./interfaces";
 
-export function generateBaseline(result: CheckOperationsResult): Baseline {
+export function generateBaseline(
+  resultsBySourceName: SourceResultsBySourceName,
+): Baseline {
   const baseline: Baseline = {
     version: 1,
     operations: {},
   };
-  for (const [sourceName, { output }] of Object.entries(
-    result.resultsBySourceName,
-  )) {
+  for (const [sourceName, { output }] of Object.entries(resultsBySourceName)) {
     const { errors } = output;
     for (const error of errors) {
       if ("infraction" in error) {
@@ -90,11 +90,8 @@ function filterOutput(
 
 export function filterBaseline(
   baseline: Baseline,
-  originalResult: CheckOperationsResult,
-): {
-  result: CheckOperationsResult;
-} {
-  const { resultsBySourceName: raw } = originalResult;
+  raw: SourceResultsBySourceName,
+): SourceResultsBySourceName {
   const entries = Object.entries(raw)
     .map(([sourceName, { output: rawOutput, sourceString }]) => {
       const output = filterOutput(baseline, rawOutput);
@@ -104,8 +101,5 @@ export function filterBaseline(
       return [sourceName, { output, sourceString }];
     })
     .filter((e) => e != null);
-  const result: CheckOperationsResult = {
-    resultsBySourceName: Object.fromEntries(entries),
-  };
-  return { result };
+  return Object.fromEntries(entries);
 }

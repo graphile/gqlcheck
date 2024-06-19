@@ -41,7 +41,10 @@ export interface RuleFormattedError extends GraphQLFormattedError {
 }
 
 export interface CheckOperationsResult {
+  rawResultsBySourceName: SourceResultsBySourceName;
   resultsBySourceName: SourceResultsBySourceName;
+  baseline: Baseline | null;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
 }
 
 export interface Baseline {

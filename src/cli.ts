@@ -1,10 +1,12 @@
 #!/usr/bin/env node
+import JSON5 from "json5";
 import { parseArgs } from "node:util";
 import { checkOperations } from "./main";
-import { open, readdir, stat, readFile } from "node:fs/promises";
+import { open, readdir, stat, readFile, writeFile } from "node:fs/promises";
 import { kjsonlLines } from "kjsonl";
 import { SourceLike } from "./interfaces";
 import { printResults } from "./print.js";
+import { filterBaseline, generateBaseline } from "./baseline";
 
 const { values, positionals } = parseArgs({
   options: {
@@ -22,6 +24,11 @@ const { values, positionals } = parseArgs({
       type: "string",
       short: "s",
       // description: "Path to the GraphQL schema SDL file"
+    },
+    baseline: {
+      type: "string",
+      short: "b",
+      // description: "Path to the baseline file"
     },
   },
   allowPositionals: true,
@@ -78,8 +85,27 @@ async function* getOperations(): AsyncIterableIterator<SourceLike> {
 async function main() {
   const conf: GraphileConfig.Preset["opcheck"] = {
     ...(values.schema ? { schemaSdlPath: values.schema } : null),
+    ...(values.baseline ? { baselinePath: values.baseline } : null),
   };
   const result = await checkOperations(getOperations, values.config, conf);
+  if (values["update-baseline"]) {
+    const baselinePath = result.resolvedPreset.opcheck?.baselinePath;
+    if (!baselinePath) {
+      throw new Error(
+        `--update-baseline was specified without --baseline, and no preset.opcheck.baselinePath was found in your configuration; aborting.`,
+      );
+    }
+    const newBaseline = generateBaseline(result.rawResultsBySourceName);
+    const data = baselinePath.endsWith(".json5")
+      ? JSON5.stringify(newBaseline, null, 2)
+      : JSON.stringify(newBaseline, null, 2);
+    await writeFile(baselinePath, data + "\n");
+    result.baseline = newBaseline;
+    result.resultsBySourceName = filterBaseline(
+      newBaseline,
+      result.rawResultsBySourceName,
+    );
+  }
   console.log(printResults(result));
 }
 
