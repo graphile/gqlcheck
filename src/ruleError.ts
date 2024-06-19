@@ -6,7 +6,7 @@ export interface RuleErrorOptions extends GraphQLErrorOptions {
   operationName: string | undefined;
   operationCoordinates: string[];
   /** What needs to be added to the overrides for this coordinate for this error to be ignored? */
-  override: GraphileConfig.OpcheckRuleConfig;
+  override: GraphileConfig.DoccheckRuleConfig;
 }
 
 export class RuleError extends GraphQLError {

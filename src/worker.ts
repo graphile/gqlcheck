@@ -43,9 +43,9 @@ const definitelyParentPort = parentPort;
 async function main() {
   const { configPath, overrideConfig } = workerData as WorkerData;
   const rawConfig = await loadConfig(configPath);
-  const config = resolvePresets([rawConfig ?? {}, { opcheck: overrideConfig }]);
+  const config = resolvePresets([rawConfig ?? {}, { doccheck: overrideConfig }]);
   const {
-    opcheck: { schemaSdlPath = `${process.cwd()}/schema.graphql` } = {},
+    doccheck: { schemaSdlPath = `${process.cwd()}/schema.graphql` } = {},
   } = config;
 
   const schemaString = readFileSync(schemaSdlPath, "utf8");

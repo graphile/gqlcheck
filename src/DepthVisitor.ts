@@ -301,13 +301,13 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         // Report the errors
         for (const resolvedOperation of resolvedOperations) {
           const operationName = resolvedOperation.name;
-          const config: GraphileConfig.OpcheckRuleConfig = {
+          const config: GraphileConfig.DoccheckRuleConfig = {
             // Global configuration
-            ...resolvedPreset.opcheck?.config,
+            ...resolvedPreset.doccheck?.config,
 
             // Override for this operation
             ...(operationName
-              ? resolvedPreset.opcheck?.operationOverrides?.[operationName]
+              ? resolvedPreset.doccheck?.operationOverrides?.[operationName]
               : null),
           };
           const {
@@ -331,11 +331,11 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
             "__Field.type": 1,
 
             // Global config
-            ...resolvedPreset.opcheck?.config?.maxDepthByFieldCoordinates,
+            ...resolvedPreset.doccheck?.config?.maxDepthByFieldCoordinates,
 
             // Override for this operation
             ...(operationName
-              ? resolvedPreset.opcheck?.operationOverrides?.[operationName]
+              ? resolvedPreset.doccheck?.operationOverrides?.[operationName]
                   ?.maxDepthByFieldCoordinates
               : null),
           };
@@ -346,7 +346,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
             const selfReferential = key.includes(".");
             const [limit, override, infraction, label] = ((): [
               limit: number,
-              override: GraphileConfig.OpcheckRuleConfig,
+              override: GraphileConfig.DoccheckRuleConfig,
               infraction: string,
               label: string,
             ] => {

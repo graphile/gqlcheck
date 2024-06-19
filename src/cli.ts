@@ -143,16 +143,16 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
     console.log("v" + version);
     return;
   }
-  const conf: GraphileConfig.Preset["opcheck"] = {
+  const conf: GraphileConfig.Preset["doccheck"] = {
     ...(values.schema ? { schemaSdlPath: values.schema } : null),
     ...(values.baseline ? { baselinePath: values.baseline } : null),
   };
   const result = await checkOperations(getOperations, values.config, conf);
   if (values["update-baseline"]) {
-    const baselinePath = result.resolvedPreset.opcheck?.baselinePath;
+    const baselinePath = result.resolvedPreset.doccheck?.baselinePath;
     if (!baselinePath) {
       throw new Error(
-        `--update-baseline was specified without --baseline, and no preset.opcheck.baselinePath was found in your configuration; aborting.`,
+        `--update-baseline was specified without --baseline, and no preset.doccheck.baselinePath was found in your configuration; aborting.`,
       );
     }
     const newBaseline = generateBaseline(result.rawResultsBySourceName);

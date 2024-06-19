@@ -1,4 +1,4 @@
-# @graphile/opcheck
+# @graphile/doccheck
 
 This tool is designed to perform checks against your GraphQL operations
 (documents) before you ship them to production, to help ensure the safety of
