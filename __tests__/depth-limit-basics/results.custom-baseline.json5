@@ -15,21 +15,7 @@
   'FoFoF_fragments.graphql': {
     output: {
       sourceName: 'FoFoF_fragments.graphql',
-      errors: [
-        {
-          message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoF',
-          operationCoordinates: [
-            'FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends',
-          ],
-          override: {
-            maxDepthByFieldCoordinates: {
-              'User.friends': 3,
-            },
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoF',

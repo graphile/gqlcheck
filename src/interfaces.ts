@@ -60,10 +60,12 @@ export interface CheckOperationsResult {
 export interface Baseline {
   version: 1;
   operations: {
-    [operationName: string]: {
-      ignoreCoordinatesByRule: {
-        [ruleName: string]: string[];
-      };
-    };
+    [operationName: string]:
+      | {
+          ignoreCoordinatesByRule: {
+            [ruleName: string]: string[] | undefined;
+          };
+        }
+      | undefined;
   };
 }

@@ -15,21 +15,7 @@
   'FoFoF_fragments.graphql': {
     output: {
       sourceName: 'FoFoF_fragments.graphql',
-      errors: [
-        {
-          message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoF',
-          operationCoordinates: [
-            'FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends',
-          ],
-          override: {
-            maxDepthByFieldCoordinates: {
-              'User.friends': 3,
-            },
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoF',
@@ -42,21 +28,7 @@
   'FoFoF.graphql': {
     output: {
       sourceName: 'FoFoF.graphql',
-      errors: [
-        {
-          message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoF',
-          operationCoordinates: [
-            'FoFoF:query>currentUser>friends>friends>friends',
-          ],
-          override: {
-            maxDepthByFieldCoordinates: {
-              'User.friends': 3,
-            },
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoF',
@@ -69,21 +41,7 @@
   'FoFoFoF_fragments.graphql': {
     output: {
       sourceName: 'FoFoFoF_fragments.graphql',
-      errors: [
-        {
-          message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoFoF',
-          operationCoordinates: [
-            'FoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends',
-          ],
-          override: {
-            maxDepthByFieldCoordinates: {
-              'User.friends': 4,
-            },
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoFoF',
@@ -96,21 +54,7 @@
   'FoFoFoF.graphql': {
     output: {
       sourceName: 'FoFoFoF.graphql',
-      errors: [
-        {
-          message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoFoF',
-          operationCoordinates: [
-            'FoFoFoF:query>currentUser>friends>friends>friends>friends',
-          ],
-          override: {
-            maxDepthByFieldCoordinates: {
-              'User.friends': 4,
-            },
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoFoF',
@@ -149,19 +93,7 @@
   'FoFoFoFoFoF_fragments.graphql': {
     output: {
       sourceName: 'FoFoFoFoFoF_fragments.graphql',
-      errors: [
-        {
-          message: 'Maximum list nesting depth limit exceeded: 6 > 5',
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoFoFoFoF',
-          operationCoordinates: [
-            'FoFoFoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends>F5:User.friends>F6:User.friends',
-          ],
-          override: {
-            maxListDepth: 6,
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoFoFoFoF',
@@ -174,19 +106,7 @@
   'FoFoFoFoFoF.graphql': {
     output: {
       sourceName: 'FoFoFoFoFoF.graphql',
-      errors: [
-        {
-          message: 'Maximum list nesting depth limit exceeded: 6 > 5',
-          ruleName: 'DepthLimit',
-          operationName: 'FoFoFoFoFoF',
-          operationCoordinates: [
-            'FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends',
-          ],
-          override: {
-            maxListDepth: 6,
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'FoFoFoFoFoF',
@@ -283,19 +203,7 @@
   'Self10_fragments.graphql': {
     output: {
       sourceName: 'Self10_fragments.graphql',
-      errors: [
-        {
-          message: 'Maximum selection depth limit exceeded: 11 > 10',
-          ruleName: 'DepthLimit',
-          operationName: 'Self10',
-          operationCoordinates: [
-            'Self10:query>currentUser>self>F1:User.self>F2:User.self>F3:User.self>F4:User.self>F5:User.self>F6:User.self>F7:User.self>F8:User.self>F9:User.self',
-          ],
-          override: {
-            maxDepth: 11,
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'Self10',
@@ -308,19 +216,7 @@
   'Self10.graphql': {
     output: {
       sourceName: 'Self10.graphql',
-      errors: [
-        {
-          message: 'Maximum selection depth limit exceeded: 11 > 10',
-          ruleName: 'DepthLimit',
-          operationName: 'Self10',
-          operationCoordinates: [
-            'Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self',
-          ],
-          override: {
-            maxDepth: 11,
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'Self10',
@@ -359,19 +255,7 @@
   'SelfOtherSelf5.graphql': {
     output: {
       sourceName: 'SelfOtherSelf5.graphql',
-      errors: [
-        {
-          message: 'Maximum selection depth limit exceeded: 11 > 10',
-          ruleName: 'DepthLimit',
-          operationName: 'SelfOtherSelf5',
-          operationCoordinates: [
-            'SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf',
-          ],
-          override: {
-            maxDepth: 11,
-          },
-        },
-      ],
+      errors: [],
       operations: [
         {
           operationName: 'SelfOtherSelf5',
