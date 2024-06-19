@@ -13,7 +13,11 @@ export class RuleError extends GraphQLError {
   options!: RuleErrorOptions;
   constructor(message: string, options: RuleErrorOptions) {
     super(message, options);
-    this.name = "RuleError";
+    try {
+      this.name = "RuleError";
+    } catch (e) {
+      // Ignore
+    }
     Object.defineProperty(this, "options", { value: options });
   }
   toJSON(): RuleFormattedError {
