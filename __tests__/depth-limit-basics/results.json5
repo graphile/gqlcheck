@@ -12,6 +12,19 @@
       ],
     },
   },
+  'FoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoF_fragments.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'FoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
   'FoFoF.graphql': {
     output: {
       sourceName: 'FoFoF.graphql',
@@ -66,6 +79,19 @@
       ],
     },
   },
+  'FoFoFoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoFoFoF_fragments.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'FoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
   'FoFoFoFoF.graphql': {
     output: {
       sourceName: 'FoFoFoFoF.graphql',
@@ -73,6 +99,31 @@
       operations: [
         {
           operationName: 'FoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoFoFoFoF_fragments.graphql',
+      errors: [
+        {
+          message: 'Maximum list nesting depth limit exceeded: 6 > 5',
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoFoFoF',
+          operationCoordinates: [
+            'FoFoFoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends>F5:User.friends>F6:User.friends',
+          ],
+          override: {
+            maxListDepth: 6,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoFoFoF',
           operationKind: 'query',
           issues: [],
         },
@@ -104,6 +155,31 @@
       ],
     },
   },
+  'Self10_fragments.graphql': {
+    output: {
+      sourceName: 'Self10_fragments.graphql',
+      errors: [
+        {
+          message: 'Maximum selection depth limit exceeded: 11 > 10',
+          ruleName: 'DepthLimit',
+          operationName: 'Self10',
+          operationCoordinates: [
+            'Self10:query>currentUser>self>F1:User.self>F2:User.self>F3:User.self>F4:User.self>F5:User.self>F6:User.self>F7:User.self>F8:User.self>F9:User.self',
+          ],
+          override: {
+            maxDepth: 11,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'Self10',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
   'Self10.graphql': {
     output: {
       sourceName: 'Self10.graphql',
@@ -123,6 +199,19 @@
       operations: [
         {
           operationName: 'Self10',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Self9_fragments.graphql': {
+    output: {
+      sourceName: 'Self9_fragments.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'Self9',
           operationKind: 'query',
           issues: [],
         },

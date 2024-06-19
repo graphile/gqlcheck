@@ -1,0 +1,47 @@
+query Self9 {
+  currentUser {
+    self {
+      ...F1
+    }
+  }
+}
+fragment F1 on User {
+  self {
+    ...F2
+  }
+}
+fragment F2 on User {
+  self {
+    ...F3
+  }
+}
+fragment F3 on User {
+  self {
+    ...F4
+  }
+}
+fragment F4 on User {
+  self {
+    ...F5
+  }
+}
+fragment F5 on User {
+  self {
+    ...F6
+  }
+}
+fragment F6 on User {
+  self {
+    ...F7
+  }
+}
+fragment F7 on User {
+  self {
+    ...F8
+  }
+}
+fragment F8 on User {
+  self {
+    name
+  }
+}
