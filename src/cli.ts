@@ -18,6 +18,11 @@ const { values, positionals } = parseArgs({
       short: "u",
       // description: "Update the baseline.json file to allow all passed documents even if they break the rules."
     },
+    schema: {
+      type: "string",
+      short: "s",
+      // description: "Path to the GraphQL schema SDL file"
+    },
   },
   allowPositionals: true,
   strict: true,
@@ -71,7 +76,10 @@ async function* getOperations(): AsyncIterableIterator<SourceLike> {
 }
 
 async function main() {
-  const result = await checkOperations(getOperations, values.config);
+  const conf: GraphileConfig.Preset["opcheck"] = {
+    ...(values.schema ? { schemaSdlPath: values.schema } : null),
+  };
+  const result = await checkOperations(getOperations, values.config, conf);
   console.log(printResults(result));
 }
 

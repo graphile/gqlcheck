@@ -2,6 +2,7 @@ import { GraphQLFormattedError } from "graphql";
 
 export interface WorkerData {
   configPath: string | null | undefined;
+  overrideConfig: GraphileConfig.Preset["opcheck"] | undefined;
 }
 
 export interface CheckDocumentRequest {

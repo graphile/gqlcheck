@@ -34,6 +34,7 @@ function defer<T>(): Deferred<T> {
 export async function checkOperations(
   getDocuments: () => AsyncIterable<string | SourceLike>,
   configPath?: string,
+  overrideConfig?: GraphileConfig.Preset["opcheck"],
 ): Promise<CheckOperationsResult> {
   const rawConfig = await loadConfig(configPath);
   const config = rawConfig ? resolvePresets([rawConfig]) : {};
@@ -46,10 +47,12 @@ export async function checkOperations(
   for (let i = 0; i < workerCount; i++) {
     const deferred = defer<Worker>();
     const workerNumber = i;
+    const workerData: WorkerData = {
+      configPath,
+      overrideConfig,
+    };
     const worker = new Worker(`${__dirname}/worker.js`, {
-      workerData: {
-        configPath,
-      } as WorkerData,
+      workerData,
     });
     worker.on("error", (error) => {
       worker.terminate();
