@@ -74,7 +74,7 @@ export async function getDirHelpers(dirname) {
 
       {
         const outputFile = `${dirname}/output.${scope ? scope + "." : ""}ansi`;
-        const output = printResults(result, true);
+        const output = printResults(result, true) + "\n";
         /** @type { string | null} */
         let expectedOutput;
         try {
