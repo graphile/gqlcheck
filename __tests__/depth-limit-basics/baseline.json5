@@ -3,7 +3,7 @@
   operations: {
     FoFoF: {
       ignoreCoordinatesByRule: {
-        "maxDepthByFieldCoordinates['User.friends']": "FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends"
+        "maxDepthByFieldCoordinates['User.friends']": ["FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends"]
       }
     }
   }
