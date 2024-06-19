@@ -7,8 +7,8 @@ import { getDirHelpers } from "../common.mjs";
 const __dirname = new URL(".", import.meta.url).pathname;
 
 it("works", async () => {
-  const { getDocuments, configPath, checkResults } =
+  const { getDocuments, configPath, checkResult } =
     await getDirHelpers(__dirname);
-  const { results } = await checkOperations(getDocuments, configPath);
-  await checkResults(results);
+  const result = await checkOperations(getDocuments, configPath);
+  await checkResult(result);
 });
