@@ -13,8 +13,6 @@ import {
 import { RulesContext } from "./rulesContext";
 import { RuleError } from "./ruleError";
 
-const RULE_NAME = "DepthLimit";
-
 interface DepthInfo {
   current: number;
   max: number;
@@ -346,9 +344,10 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
           for (const key of Object.keys(resolvedOperation.depths)) {
             const { max, coordsByDepth } = resolvedOperation.depths[key]!;
             const selfReferential = key.includes(".");
-            const [limit, override, label] = ((): [
+            const [limit, override, ruleName, label] = ((): [
               limit: number,
               override: GraphileConfig.OpcheckRuleConfig,
+              ruleName: string,
               label: string,
             ] => {
               if (selfReferential) {
@@ -363,6 +362,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
                 return [
                   limit,
                   { maxDepthByFieldCoordinates: { [key]: max } },
+                  `maxDepthByFieldCoordinates['${key}']`,
                   `Self-reference limit for field '${key}'`,
                 ];
               } else {
@@ -371,24 +371,28 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
                     return [
                       maxDepth,
                       { maxDepth: max },
+                      "maxDepth",
                       "Maximum selection depth limit",
                     ];
                   case "lists":
                     return [
                       maxListDepth,
                       { maxListDepth: max },
+                      "maxListDepth",
                       "Maximum list nesting depth limit",
                     ];
                   case "introspectionFields":
                     return [
                       maxIntrospectionDepth,
                       { maxIntrospectionDepth: max },
+                      "maxIntrospectionDepth",
                       "Maximum introspection selection depth limit",
                     ];
                   case "introspectionLists":
                     return [
                       maxIntrospectionListDepth,
                       { maxIntrospectionListDepth: max },
+                      "maxIntrospectionListDepth",
                       "Maximum introspection list nesting depth limit",
                     ];
                   default: {
@@ -407,7 +411,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
               const error = new RuleError(
                 `${label} exceeded: ${max} > ${limit}`,
                 {
-                  ruleName: RULE_NAME,
+                  ruleName,
                   operationName,
                   operationCoordinates,
                   override,
