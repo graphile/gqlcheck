@@ -1,5 +1,12 @@
-import { GraphQLError, GraphQLErrorOptions } from "graphql";
+import {
+  version as GraphQLVersion,
+  formatError,
+  GraphQLError,
+  GraphQLErrorOptions,
+} from "graphql";
 import { RuleFormattedError } from "./interfaces";
+
+const graphqlMajor = parseInt(GraphQLVersion.split(".")[0], 10);
 
 export interface RuleErrorOptions extends GraphQLErrorOptions {
   infraction: string;
@@ -12,17 +19,26 @@ export interface RuleErrorOptions extends GraphQLErrorOptions {
 export class RuleError extends GraphQLError {
   options!: RuleErrorOptions;
   constructor(message: string, options: RuleErrorOptions) {
-    super(message, options);
+    if (graphqlMajor < 16) {
+      // @ts-ignore
+      const { nodes, source, positions, path, originalError, extensions } =
+        options;
+      // message, nodes, source, positions, path, originalError, extensions
+      // @ts-ignore
+      super(message, nodes, source, positions, path, originalError, extensions);
+    } else {
+      super(message, options);
+    }
     try {
       this.name = "RuleError";
     } catch (e) {
-      // Ignore
+      // Ignore error on GraphQL v15
     }
     Object.defineProperty(this, "options", { value: options });
   }
   toJSON(): RuleFormattedError {
     return {
-      ...super.toJSON(),
+      ...(super.toJSON?.() ?? formatError(this)),
       infraction: this.options.infraction,
       operationName: this.options.operationName,
       operationCoordinates: this.options.operationCoordinates,

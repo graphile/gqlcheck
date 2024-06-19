@@ -2,6 +2,7 @@ import { isMainThread, parentPort, workerData } from "node:worker_threads";
 import { readFileSync } from "node:fs";
 import {
   buildASTSchema,
+  formatError,
   GraphQLError,
   GraphQLFormattedError,
   Kind,
@@ -84,14 +85,14 @@ async function main() {
       return {
         sourceName,
         operations: [],
-        errors: validationErrors.map((e) => e.toJSON()),
+        errors: validationErrors.map((e) => e.toJSON?.() ?? formatError(e)),
       };
     }
 
     const typeInfo = new TypeAndOperationPathInfo(schema);
     const errors: (RuleFormattedError | GraphQLFormattedError)[] = [];
     function onError(error: RuleError | GraphQLError) {
-      errors.push(error.toJSON());
+      errors.push(error.toJSON?.() ?? formatError(error));
     }
     const rulesContext = new RulesContext(
       schema,
