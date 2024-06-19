@@ -1,0 +1,102 @@
+{
+  'directives-additional.test.graphql': {
+    output: {
+      sourceName: 'directives-additional.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'TestDirectivesAdditional',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'directives-fragments.test.graphql': {
+    output: {
+      sourceName: 'directives-fragments.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'TestDirectivesFragments',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'directives.test.graphql': {
+    output: {
+      sourceName: 'directives.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'TestDirectives',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'mutation-create.test.graphql': {
+    output: {
+      sourceName: 'mutation-create.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'CreateMutation',
+          operationKind: 'mutation',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'mutation-delete.test.graphql': {
+    output: {
+      sourceName: 'mutation-delete.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationKind: 'mutation',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'mutation-return-types.test.graphql': {
+    output: {
+      sourceName: 'mutation-return-types.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationKind: 'mutation',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'mutation-update.test.graphql': {
+    output: {
+      sourceName: 'mutation-update.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationKind: 'mutation',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'posts.test.graphql': {
+    output: {
+      sourceName: 'posts.test.graphql',
+      errors: [],
+      operations: [
+        {
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+}
