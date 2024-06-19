@@ -254,7 +254,7 @@ other open source projects too!
 - [Trusted documents](https://benjie.dev/graphql/trusted-documents) to protect
   your server from untrusted queries
 - [@graphile/depth-limit](https://github.com/graphile/depth-limit) to help
-  reduce
+  reduce query amplification attacks
 
 ## Thanks
 
