@@ -56,3 +56,14 @@ export interface RuleFormattedError extends GraphQLFormattedError {
 export interface CheckOperationsResult {
   resultsBySourceName: SourceResultsBySourceName;
 }
+
+export interface Baseline {
+  version: 1;
+  operations: {
+    [operationName: string]: {
+      ignoreCoordinatesByRule: {
+        [ruleName: string]: string[];
+      };
+    };
+  };
+}

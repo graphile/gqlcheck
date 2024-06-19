@@ -1,0 +1,10 @@
+{
+  version: 1,
+  operations: {
+    FoFoF: {
+      ignoreCoordinatesByRule: {
+        "DepthLimit": "FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends"
+      }
+    }
+  }
+}

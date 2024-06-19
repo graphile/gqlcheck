@@ -1,0 +1,384 @@
+{
+  'F.graphql': {
+    output: {
+      sourceName: 'F.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'F',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoF_fragments.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoF',
+          operationCoordinates: [
+            'FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 3,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoF.graphql': {
+    output: {
+      sourceName: 'FoFoF.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoF',
+          operationCoordinates: [
+            'FoFoF:query>currentUser>friends>friends>friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 3,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoFoF_fragments.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoF',
+          operationCoordinates: [
+            'FoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 4,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoF.graphql': {
+    output: {
+      sourceName: 'FoFoFoF.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoF',
+          operationCoordinates: [
+            'FoFoFoF:query>currentUser>friends>friends>friends>friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 4,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoFoFoF_fragments.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'FoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoF.graphql': {
+    output: {
+      sourceName: 'FoFoFoFoF.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'FoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoFoFoFoF_fragments.graphql',
+      errors: [
+        {
+          message: 'Maximum list nesting depth limit exceeded: 6 > 5',
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoFoFoF',
+          operationCoordinates: [
+            'FoFoFoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends>F5:User.friends>F6:User.friends',
+          ],
+          override: {
+            maxListDepth: 6,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoFoF.graphql': {
+    output: {
+      sourceName: 'FoFoFoFoFoF.graphql',
+      errors: [
+        {
+          message: 'Maximum list nesting depth limit exceeded: 6 > 5',
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoFoFoF',
+          operationCoordinates: [
+            'FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends',
+          ],
+          override: {
+            maxListDepth: 6,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_nx_field.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_nx_field.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Cannot query field "nonExistentField" on type "User".',
+          locations: [
+            {
+              line: 24,
+              column: 3,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_nx_frag.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_nx_frag.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Unknown fragment "NonExistantFragment".',
+          locations: [
+            {
+              line: 29,
+              column: 8,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_tight_cycle.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_tight_cycle.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Cannot spread fragment "F1" within itself.',
+          locations: [
+            {
+              line: 9,
+              column: 5,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_wide_cycle.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_wide_cycle.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Cannot spread fragment "F1" within itself via "F2", "F3", "F4", "F5".',
+          locations: [
+            {
+              line: 9,
+              column: 5,
+            },
+            {
+              line: 14,
+              column: 5,
+            },
+            {
+              line: 19,
+              column: 5,
+            },
+            {
+              line: 24,
+              column: 5,
+            },
+            {
+              line: 29,
+              column: 5,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Self10_fragments.graphql': {
+    output: {
+      sourceName: 'Self10_fragments.graphql',
+      errors: [
+        {
+          message: 'Maximum selection depth limit exceeded: 11 > 10',
+          ruleName: 'DepthLimit',
+          operationName: 'Self10',
+          operationCoordinates: [
+            'Self10:query>currentUser>self>F1:User.self>F2:User.self>F3:User.self>F4:User.self>F5:User.self>F6:User.self>F7:User.self>F8:User.self>F9:User.self',
+          ],
+          override: {
+            maxDepth: 11,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'Self10',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Self10.graphql': {
+    output: {
+      sourceName: 'Self10.graphql',
+      errors: [
+        {
+          message: 'Maximum selection depth limit exceeded: 11 > 10',
+          ruleName: 'DepthLimit',
+          operationName: 'Self10',
+          operationCoordinates: [
+            'Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self',
+          ],
+          override: {
+            maxDepth: 11,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'Self10',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Self9_fragments.graphql': {
+    output: {
+      sourceName: 'Self9_fragments.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'Self9',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Self9.graphql': {
+    output: {
+      sourceName: 'Self9.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'Self9',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'SelfOtherSelf5.graphql': {
+    output: {
+      sourceName: 'SelfOtherSelf5.graphql',
+      errors: [
+        {
+          message: 'Maximum selection depth limit exceeded: 11 > 10',
+          ruleName: 'DepthLimit',
+          operationName: 'SelfOtherSelf5',
+          operationCoordinates: [
+            'SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf',
+          ],
+          override: {
+            maxDepth: 11,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'SelfOtherSelf5',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+}

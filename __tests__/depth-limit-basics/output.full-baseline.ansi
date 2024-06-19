@@ -1,0 +1,56 @@
+FoFoF_fragments.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 3 > 2
+  Problematic paths:
+  - FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends
+
+FoFoF.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 3 > 2
+  Problematic paths:
+  - FoFoF:query>currentUser>friends>friends>friends
+
+FoFoFoF_fragments.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 4 > 3
+  Problematic paths:
+  - FoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends
+
+FoFoFoF.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 4 > 3
+  Problematic paths:
+  - FoFoFoF:query>currentUser>friends>friends>friends>friends
+
+FoFoFoFoFoF_fragments.graphql:
+- Maximum list nesting depth limit exceeded: 6 > 5
+  Problematic paths:
+  - FoFoFoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends>F5:User.friends>F6:User.friends
+
+FoFoFoFoFoF.graphql:
+- Maximum list nesting depth limit exceeded: 6 > 5
+  Problematic paths:
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends
+
+Invalid_FoFoFoFoF_nx_field.graphql:
+- [24:3] Cannot query field "nonExistentField" on type "User".
+
+Invalid_FoFoFoFoF_nx_frag.graphql:
+- [29:8] Unknown fragment "NonExistantFragment".
+
+Invalid_FoFoFoFoF_tight_cycle.graphql:
+- [9:5] Cannot spread fragment "F1" within itself.
+
+Invalid_FoFoFoFoF_wide_cycle.graphql:
+- [9:5] Cannot spread fragment "F1" within itself via "F2", "F3", "F4", "F5".
+
+Self10_fragments.graphql:
+- Maximum selection depth limit exceeded: 11 > 10
+  Problematic paths:
+  - Self10:query>currentUser>self>F1:User.self>F2:User.self>F3:User.self>F4:User.self>F5:User.self>F6:User.self>F7:User.self>F8:User.self>F9:User.self
+
+Self10.graphql:
+- Maximum selection depth limit exceeded: 11 > 10
+  Problematic paths:
+  - Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self
+
+SelfOtherSelf5.graphql:
+- Maximum selection depth limit exceeded: 11 > 10
+  Problematic paths:
+  - SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf

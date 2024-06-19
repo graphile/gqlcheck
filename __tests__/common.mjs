@@ -13,14 +13,12 @@ const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 /** @typedef {{
  *   getDocuments: () => AsyncIterableIterator<SourceLike>,
  *   configPath: string,
- *   checkResult: (result: CheckOperationsResult) => Promise<void>,
+ *   checkResult: (result: CheckOperationsResult, scope = "") => Promise<void>,
  * }} DirHelpers */
 /** @type {(dirname: string) => Promise<DirHelpers>} */
 export async function getDirHelpers(dirname) {
   const documentsDir = `${dirname}/documents`;
   const configPath = `${dirname}/graphile.config.mjs`;
-  const resultsFile = `${dirname}/results.json5`;
-  const outputFile = `${dirname}/output.ansi`;
   const files = (await readdir(documentsDir)).filter((f) =>
     f.endsWith(".graphql"),
   );
@@ -42,8 +40,9 @@ export async function getDirHelpers(dirname) {
         yield { name, body };
       }
     },
-    async checkResult(result) {
+    async checkResult(result, scope) {
       {
+        const resultsFile = `${dirname}/results.${scope ? scope + "." : ""}json5`;
         // Sort the results by key
         const results = Object.fromEntries(
           Object.entries(result.resultsBySourceName)
@@ -74,6 +73,7 @@ export async function getDirHelpers(dirname) {
       }
 
       {
+        const outputFile = `${dirname}/output.${scope ? scope + "." : ""}ansi`;
         const output = printResults(result, true);
         /** @type { string | null} */
         let expectedOutput;
