@@ -2,7 +2,7 @@ import { GraphQLFormattedError } from "graphql";
 
 export interface WorkerData {
   configPath: string | null | undefined;
-  overrideConfig: GraphileConfig.Preset["doccheck"] | undefined;
+  overrideConfig: GraphileConfig.Preset["gqlcheck"] | undefined;
 }
 
 export interface CheckDocumentRequest {
@@ -37,7 +37,7 @@ export interface RuleFormattedError extends GraphQLFormattedError {
   infraction: string;
   operationName: string | undefined;
   operationCoordinates: string[];
-  override: GraphileConfig.DoccheckRuleConfig;
+  override: GraphileConfig.GraphQLCheckConfig;
 }
 
 export interface CheckOperationsResult {

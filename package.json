@@ -1,10 +1,10 @@
 {
-  "name": "@graphile/doccheck",
+  "name": "gqlcheck",
   "version": "0.0.0",
   "description": "Performs additional checks on your GraphQL documents and operations to ensure they conform to your rules, whilst allow-listing existing operations and their constituent parts (and allowing overrides on a per-field basis). Rules include max selection set depth, max list nesting, require pagination, limit self-referencing loops, etc. Add your own rules!",
   "main": "dist/index.js",
   "bin": {
-    "doccheck": "dist/cli.js"
+    "gqlcheck": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/doccheck.git"
+    "url": "git+https://github.com/graphile/gqlcheck.git"
   },
   "keywords": [
     "graphql",
@@ -34,9 +34,9 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/doccheck/issues"
+    "url": "https://github.com/graphile/gqlcheck/issues"
   },
-  "homepage": "https://github.com/graphile/doccheck#readme",
+  "homepage": "https://github.com/graphile/gqlcheck#readme",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/debug": "^4.1.12",

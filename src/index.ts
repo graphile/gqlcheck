@@ -11,17 +11,17 @@ export { filterBaseline, generateBaseline } from "./baseline.js";
 declare global {
   namespace GraphileConfig {
     interface Preset {
-      doccheck?: {
+      gqlcheck?: {
         workerCount?: number;
         baselinePath?: string;
         schemaSdlPath?: string;
         operationOverrides?: {
-          [operationName: string]: GraphileConfig.DoccheckRuleConfig;
+          [operationName: string]: GraphileConfig.GraphQLCheckConfig;
         };
-        config?: GraphileConfig.DoccheckRuleConfig;
+        config?: GraphileConfig.GraphQLCheckConfig;
       };
     }
-    interface DoccheckRuleConfig {
+    interface GraphQLCheckConfig {
       maxDepth?: number;
       maxListDepth?: number;
       maxSelfReferentialDepth?: number;

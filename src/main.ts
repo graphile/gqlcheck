@@ -16,7 +16,7 @@ import debugFactory from "debug";
 import { readFile } from "node:fs/promises";
 import { filterBaseline } from "./baseline";
 
-const debug = debugFactory("doccheck");
+const debug = debugFactory("gqlcheck");
 
 type Deferred<T> = Promise<T> & {
   resolve: (value: T | PromiseLike<T>) => void;
@@ -64,11 +64,11 @@ async function loadBaseline(
 export async function checkOperations(
   getDocuments: () => AsyncIterable<string | SourceLike>,
   configPath?: string,
-  overrideConfig?: GraphileConfig.Preset["doccheck"],
+  overrideConfig?: GraphileConfig.Preset["gqlcheck"],
 ): Promise<CheckOperationsResult> {
   const rawConfig = await loadConfig(configPath);
-  const config = resolvePresets([rawConfig ?? {}, { doccheck: overrideConfig }]);
-  const { doccheck: { baselinePath, workerCount = os.cpus().length } = {} } =
+  const config = resolvePresets([rawConfig ?? {}, { gqlcheck: overrideConfig }]);
+  const { gqlcheck: { baselinePath, workerCount = os.cpus().length } = {} } =
     config;
   const baseline = await loadBaseline(baselinePath);
   const workerPromises: Promise<Worker>[] = [];

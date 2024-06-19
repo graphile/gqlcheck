@@ -5,7 +5,7 @@ const __dirname = new URL(".", import.meta.url).pathname;
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
-  doccheck: {
+  gqlcheck: {
     schemaSdlPath: `${__dirname}/schema.graphqls`,
     config: {
       maxListDepth: 5,
