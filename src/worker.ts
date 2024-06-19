@@ -43,7 +43,10 @@ const definitelyParentPort = parentPort;
 async function main() {
   const { configPath, overrideConfig } = workerData as WorkerData;
   const rawConfig = await loadConfig(configPath);
-  const config = resolvePresets([rawConfig ?? {}, { gqlcheck: overrideConfig }]);
+  const config = resolvePresets([
+    rawConfig ?? {},
+    { gqlcheck: overrideConfig },
+  ]);
   const {
     gqlcheck: { schemaSdlPath = `${process.cwd()}/schema.graphql` } = {},
   } = config;

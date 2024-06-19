@@ -67,7 +67,10 @@ export async function checkOperations(
   overrideConfig?: GraphileConfig.Preset["gqlcheck"],
 ): Promise<CheckOperationsResult> {
   const rawConfig = await loadConfig(configPath);
-  const config = resolvePresets([rawConfig ?? {}, { gqlcheck: overrideConfig }]);
+  const config = resolvePresets([
+    rawConfig ?? {},
+    { gqlcheck: overrideConfig },
+  ]);
   const { gqlcheck: { baselinePath, workerCount = os.cpus().length } = {} } =
     config;
   const baseline = await loadBaseline(baselinePath);
