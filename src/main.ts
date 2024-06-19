@@ -3,10 +3,11 @@ import { Worker } from "node:worker_threads";
 import * as os from "node:os";
 import {
   CheckDocumentRequest,
-  CheckDocumentResult,
+  CheckDocumentOutput,
   WorkerData,
   SourceLike,
-  Results,
+  SourceResultsBySourceName,
+  CheckOperationsResult,
 } from "./interfaces";
 import { loadConfig } from "graphile-config/load";
 import debugFactory from "debug";
@@ -33,7 +34,7 @@ function defer<T>(): Deferred<T> {
 export async function checkOperations(
   getDocuments: () => AsyncIterable<string | SourceLike>,
   configPath?: string,
-) {
+): Promise<CheckOperationsResult> {
   const rawConfig = await loadConfig(configPath);
   const config = rawConfig ? resolvePresets([rawConfig]) : {};
   const { opcheck: { workerCount = os.cpus().length } = {} } = config;
@@ -134,7 +135,7 @@ export async function checkOperations(
     return { request, resultPromise };
   }
 
-  const startedTasks: Task<CheckDocumentRequest, CheckDocumentResult>[] = [];
+  const startedTasks: Task<CheckDocumentRequest, CheckDocumentOutput>[] = [];
   let index = -1;
   const sourceNames = new Set<string>();
 
@@ -155,7 +156,7 @@ export async function checkOperations(
     const sourceString = typeof source === "string" ? source : source.body;
     const task = await startWorkerTask<
       CheckDocumentRequest,
-      CheckDocumentResult
+      CheckDocumentOutput
     >({
       sourceName,
       sourceString,
@@ -167,7 +168,7 @@ export async function checkOperations(
   // complete.
   const allResults: Array<{
     request: CheckDocumentRequest;
-    result: CheckDocumentResult;
+    result: CheckDocumentOutput;
   }> = [];
   for (const task of startedTasks) {
     const request = task.request;
@@ -180,7 +181,7 @@ export async function checkOperations(
     allResults.push({ request, result });
   }
 
-  const results: Results = Object.create(null);
+  const results: SourceResultsBySourceName = Object.create(null);
   const operationKindByOperationName = new Map<string, string>();
   for (const { request, result } of allResults) {
     const { sourceName, sourceString } = request;
@@ -203,7 +204,7 @@ export async function checkOperations(
     }
     results[sourceName] = {
       sourceString,
-      result,
+      output: result,
     };
   }
 
@@ -211,7 +212,7 @@ export async function checkOperations(
 
   return {
     // TODO: counters: documents, operations, fragments, fields, arguments
-    results,
+    resultsBySourceName: results,
   };
 
   /*

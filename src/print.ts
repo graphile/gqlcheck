@@ -1,5 +1,10 @@
 import { GraphQLFormattedError } from "graphql";
-import { Issue, Results, RuleFormattedError } from "./interfaces.js";
+import {
+  Issue,
+  SourceResultsBySourceName,
+  RuleFormattedError,
+  CheckOperationsResult,
+} from "./interfaces.js";
 
 function printGraphQLFormattedErrorLocations(
   error: GraphQLFormattedError,
@@ -43,14 +48,15 @@ function printIssue(
   }
 }
 
-export function printResults(results: Results, detailed = false) {
+export function printResults(result: CheckOperationsResult, detailed = false) {
+  const results = result.resultsBySourceName;
   const parts = Object.entries(results)
     .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
     .map(([sourceName, spec]) => {
-      const { result } = spec;
+      const { output } = spec;
       const items: string[] = [];
-      if (result.errors) {
-        for (const error of result.errors) {
+      if (output.errors) {
+        for (const error of output.errors) {
           if ("ruleName" in error) {
             items.push(printRuleFormattedError(error));
           } else {
@@ -58,9 +64,9 @@ export function printResults(results: Results, detailed = false) {
           }
         }
       }
-      if (result.operations) {
+      if (output.operations) {
         // What if we have fragment rules? Should it always be operation-centric?
-        for (const op of result.operations) {
+        for (const op of output.operations) {
           const { operationKind, operationName, issues } = op;
           for (const issue of issues) {
             items.push(printIssue(issue, op, detailed));

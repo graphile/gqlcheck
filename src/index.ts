@@ -1,4 +1,8 @@
-export { SourceLike, Results } from "./interfaces.js";
+export {
+  SourceLike,
+  SourceResultsBySourceName as SourceResultBySourceName,
+  CheckOperationsResult,
+} from "./interfaces.js";
 export { checkOperations } from "./main.js";
 
 declare global {

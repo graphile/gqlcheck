@@ -71,8 +71,8 @@ async function* getOperations(): AsyncIterableIterator<SourceLike> {
 }
 
 async function main() {
-  const { results } = await checkOperations(getOperations, values.config);
-  console.log(printResults(results));
+  const result = await checkOperations(getOperations, values.config);
+  console.log(printResults(result));
 }
 
 main().catch((e) => {

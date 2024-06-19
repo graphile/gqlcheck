@@ -17,7 +17,7 @@ import {
 import {
   CheckDocumentOperationResult,
   CheckDocumentRequest,
-  CheckDocumentResult,
+  CheckDocumentOutput,
   RuleFormattedError,
   WorkerData,
 } from "./interfaces";
@@ -61,7 +61,7 @@ async function main() {
 
   async function checkDocument(
     req: CheckDocumentRequest,
-  ): Promise<CheckDocumentResult> {
+  ): Promise<CheckDocumentOutput> {
     const { sourceString, sourceName } = req;
     const source = new Source(sourceString, sourceName);
     const document = parse(source);

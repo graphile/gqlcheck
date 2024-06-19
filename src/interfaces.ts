@@ -9,7 +9,7 @@ export interface CheckDocumentRequest {
   sourceString: string;
 }
 
-export interface CheckDocumentResult {
+export interface CheckDocumentOutput {
   sourceName: string;
   errors: (GraphQLFormattedError | RuleFormattedError)[];
   operations: ReadonlyArray<CheckDocumentOperationResult>;
@@ -39,10 +39,10 @@ export interface SourceLike {
   name: string;
 }
 
-export interface Results {
+export interface SourceResultsBySourceName {
   [sourceName: string]: {
     sourceString: string;
-    result: CheckDocumentResult;
+    output: CheckDocumentOutput;
   };
 }
 
@@ -51,4 +51,8 @@ export interface RuleFormattedError extends GraphQLFormattedError {
   operationName: string | undefined;
   operationCoordinates: string[];
   override: GraphileConfig.OpcheckRuleConfig;
+}
+
+export interface CheckOperationsResult {
+  resultsBySourceName: SourceResultsBySourceName;
 }
