@@ -460,12 +460,15 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         }
         const operationPath = context.getOperationPath();
         const fragmentName = node.name.value;
-        const depthValues: { [Key in keyof Depths]: number } = {
-          fields: currentRoot.depths.fields.current,
-          lists: currentRoot.depths.lists.current,
-          introspectionFields: currentRoot.depths.introspectionFields.current,
-          introspectionLists: currentRoot.depths.introspectionLists.current,
+        const depthValues: DepthValues = {
+          fields: 0,
+          lists: 0,
+          introspectionFields: 0,
+          introspectionLists: 0,
         };
+        for (const key of Object.keys(currentRoot.depths) as (keyof Depths)[]) {
+          depthValues[key] = currentRoot.depths[key]!.current;
+        }
         // Need to flag that all the depths should be extended by this
         if (!currentRoot.fragmentReferences[operationPath]) {
           currentRoot.fragmentReferences[operationPath] = {

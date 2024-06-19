@@ -1,3 +1,8 @@
+FoFoF_fragments.graphql:
+- Self-reference limit for field 'User.friends' exceeded: 3 > 2
+  Problematic paths:
+  - FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends
+
 FoFoF.graphql:
 - Self-reference limit for field 'User.friends' exceeded: 3 > 2
   Problematic paths:
