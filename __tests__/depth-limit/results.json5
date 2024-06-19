@@ -1,0 +1,170 @@
+{
+  'F.graphql': {
+    result: {
+      sourceName: 'F.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'F',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoF.graphql': {
+    result: {
+      sourceName: 'FoFoF.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoF',
+          operationCoordinates: [
+            'FoFoF:query>currentUser>friends>friends>friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 3,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoF.graphql': {
+    result: {
+      sourceName: 'FoFoFoF.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoF',
+          operationCoordinates: [
+            'FoFoFoF:query>currentUser>friends>friends>friends>friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 4,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoF.graphql': {
+    result: {
+      sourceName: 'FoFoFoFoF.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'FoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'FoFoFoFoFoF.graphql': {
+    result: {
+      sourceName: 'FoFoFoFoFoF.graphql',
+      errors: [
+        {
+          message: 'Maximum list nesting depth limit exceeded: 6 > 5',
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoFoFoF',
+          operationCoordinates: [
+            'FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends',
+          ],
+          override: {
+            maxListDepth: 6,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Self10.graphql': {
+    result: {
+      sourceName: 'Self10.graphql',
+      errors: [
+        {
+          message: 'Maximum selection depth limit exceeded: 11 > 10',
+          ruleName: 'DepthLimit',
+          operationName: 'Self10',
+          operationCoordinates: [
+            'Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self',
+          ],
+          override: {
+            maxDepth: 11,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'Self10',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'Self9.graphql': {
+    result: {
+      sourceName: 'Self9.graphql',
+      errors: [],
+      operations: [
+        {
+          operationName: 'Self9',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+  'SelfOtherSelf5.graphql': {
+    result: {
+      sourceName: 'SelfOtherSelf5.graphql',
+      errors: [
+        {
+          message: 'Maximum selection depth limit exceeded: 11 > 10',
+          ruleName: 'DepthLimit',
+          operationName: 'SelfOtherSelf5',
+          operationCoordinates: [
+            'SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf',
+          ],
+          override: {
+            maxDepth: 11,
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'SelfOtherSelf5',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
+}
