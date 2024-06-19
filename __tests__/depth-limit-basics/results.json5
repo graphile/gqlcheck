@@ -66,6 +66,33 @@
       ],
     },
   },
+  'FoFoFoF_fragments.graphql': {
+    output: {
+      sourceName: 'FoFoFoF_fragments.graphql',
+      errors: [
+        {
+          message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
+          ruleName: 'DepthLimit',
+          operationName: 'FoFoFoF',
+          operationCoordinates: [
+            'FoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends',
+          ],
+          override: {
+            maxDepthByFieldCoordinates: {
+              'User.friends': 4,
+            },
+          },
+        },
+      ],
+      operations: [
+        {
+          operationName: 'FoFoFoF',
+          operationKind: 'query',
+          issues: [],
+        },
+      ],
+    },
+  },
   'FoFoFoF.graphql': {
     output: {
       sourceName: 'FoFoFoF.graphql',
