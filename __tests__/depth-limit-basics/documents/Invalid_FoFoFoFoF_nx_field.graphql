@@ -1,0 +1,32 @@
+# This query is invalid
+
+query FoFoFoFoF {
+  currentUser {
+    ...F1
+  }
+}
+fragment F1 on User {
+  friends {
+    ...F2
+  }
+}
+fragment F2 on User {
+  friends {
+    ...F3
+  }
+}
+fragment F3 on User {
+  friends {
+    ...F4
+  }
+}
+fragment F4 on User {
+  nonExistentField {
+    ...F5
+  }
+}
+fragment F5 on User {
+  friends {
+    name
+  }
+}

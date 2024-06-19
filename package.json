@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json -w",
-    "test": "node test"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",

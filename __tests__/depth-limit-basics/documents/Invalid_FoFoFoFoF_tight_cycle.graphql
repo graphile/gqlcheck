@@ -1,0 +1,11 @@
+# This query is invalid
+query FoFoFoFoF {
+  currentUser {
+    ...F1
+  }
+}
+fragment F1 on User {
+  friends {
+    ...F1
+  }
+}

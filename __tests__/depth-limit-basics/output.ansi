@@ -28,6 +28,18 @@ FoFoFoFoFoF.graphql:
   Problematic paths:
   - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends
 
+Invalid_FoFoFoFoF_nx_field.graphql:
+- [24:3] Cannot query field "nonExistentField" on type "User".
+
+Invalid_FoFoFoFoF_nx_frag.graphql:
+- [29:8] Unknown fragment "NonExistantFragment".
+
+Invalid_FoFoFoFoF_tight_cycle.graphql:
+- [9:5] Cannot spread fragment "F1" within itself.
+
+Invalid_FoFoFoFoF_wide_cycle.graphql:
+- [9:5] Cannot spread fragment "F1" within itself via "F2", "F3", "F4", "F5".
+
 Self10_fragments.graphql:
 - Maximum selection depth limit exceeded: 11 > 10
   Problematic paths:

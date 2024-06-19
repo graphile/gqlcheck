@@ -196,6 +196,90 @@
       ],
     },
   },
+  'Invalid_FoFoFoFoF_nx_field.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_nx_field.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Cannot query field "nonExistentField" on type "User".',
+          locations: [
+            {
+              line: 24,
+              column: 3,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_nx_frag.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_nx_frag.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Unknown fragment "NonExistantFragment".',
+          locations: [
+            {
+              line: 29,
+              column: 8,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_tight_cycle.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_tight_cycle.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Cannot spread fragment "F1" within itself.',
+          locations: [
+            {
+              line: 9,
+              column: 5,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  'Invalid_FoFoFoFoF_wide_cycle.graphql': {
+    output: {
+      sourceName: 'Invalid_FoFoFoFoF_wide_cycle.graphql',
+      operations: [],
+      errors: [
+        {
+          message: 'Cannot spread fragment "F1" within itself via "F2", "F3", "F4", "F5".',
+          locations: [
+            {
+              line: 9,
+              column: 5,
+            },
+            {
+              line: 14,
+              column: 5,
+            },
+            {
+              line: 19,
+              column: 5,
+            },
+            {
+              line: 24,
+              column: 5,
+            },
+            {
+              line: 29,
+              column: 5,
+            },
+          ],
+        },
+      ],
+    },
+  },
   'Self10_fragments.graphql': {
     output: {
       sourceName: 'Self10_fragments.graphql',
