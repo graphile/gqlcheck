@@ -1,4 +1,5 @@
-import type { GraphQLFormattedError } from "graphql";
+import type { ASTVisitor, GraphQLFormattedError } from "graphql";
+import { TypeAndOperationPathInfo } from "./operationPaths";
 
 export interface WorkerData {
   configPath: string | null | undefined;
@@ -62,4 +63,12 @@ export interface Baseline {
 
 export interface CheckDocumentEvent {
   req: CheckDocumentRequest;
+}
+export interface VisitorsEvent {
+  typeInfo: TypeAndOperationPathInfo;
+  visitors: ASTVisitor[];
+}
+export interface CreateVisitorEvent {
+  typeInfo: TypeAndOperationPathInfo;
+  visitors: ASTVisitor[];
 }

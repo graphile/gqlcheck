@@ -111,8 +111,18 @@ async function main() {
       config,
       onError,
     );
-    const visitor = visitInParallel([DepthVisitor(rulesContext)]);
-    visit(document, visitWithTypeInfo(typeInfo, visitor));
+    const visitors = await middleware.run(
+      "visitors",
+      { typeInfo, visitors: [DepthVisitor(rulesContext)] },
+      ({ visitors }) => visitors,
+    );
+    const visitor = await middleware.run(
+      "createVisitor",
+      { typeInfo, visitors },
+      ({ typeInfo, visitors }) =>
+        visitWithTypeInfo(typeInfo, visitInParallel(visitors)),
+    );
+    visit(document, visitor);
 
     const operations = operationDefinitions.map(
       (operationDefinition): CheckDocumentOperationResult => {

@@ -1,6 +1,12 @@
 import "graphile-config";
 import { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
-import { CheckDocumentEvent, CheckDocumentOutput } from "./interfaces.js";
+import {
+  CheckDocumentEvent,
+  CheckDocumentOutput,
+  CreateVisitorEvent,
+  VisitorsEvent,
+} from "./interfaces.js";
+import { ASTVisitor } from "graphql";
 
 export { filterBaseline, generateBaseline } from "./baseline.js";
 export {
@@ -56,6 +62,8 @@ declare global {
       checkDocument(
         event: CheckDocumentEvent,
       ): PromiseLike<CheckDocumentOutput>;
+      visitors(event: VisitorsEvent): PromiseOrDirect<ASTVisitor[]>;
+      createVisitor(event: CreateVisitorEvent): PromiseOrDirect<ASTVisitor>;
     }
   }
 }
