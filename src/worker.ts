@@ -3,9 +3,7 @@ import { isMainThread, parentPort, workerData } from "node:worker_threads";
 
 import { resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
-import type {
-  GraphQLError,
-  GraphQLFormattedError} from "graphql";
+import type { GraphQLError, GraphQLFormattedError } from "graphql";
 import {
   buildASTSchema,
   formatError,
@@ -19,17 +17,17 @@ import {
   visitWithTypeInfo,
 } from "graphql";
 
-import { DepthVisitor } from "./DepthVisitor";
+import { DepthVisitor } from "./DepthVisitor.js";
 import type {
   CheckDocumentOperationResult,
   CheckDocumentOutput,
   CheckDocumentRequest,
   RuleFormattedError,
   WorkerData,
-} from "./interfaces";
-import { TypeAndOperationPathInfo } from "./operationPaths";
-import type { RuleError } from "./ruleError";
-import { RulesContext } from "./rulesContext";
+} from "./interfaces.js";
+import { TypeAndOperationPathInfo } from "./operationPaths.js";
+import type { RuleError } from "./ruleError.js";
+import { RulesContext } from "./rulesContext.js";
 
 if (isMainThread) {
   throw new Error(

@@ -1,6 +1,9 @@
 import type { GraphQLFormattedError } from "graphql";
 
-import type { CheckOperationsResult,RuleFormattedError } from "./interfaces.js";
+import type {
+  CheckOperationsResult,
+  RuleFormattedError,
+} from "./interfaces.js";
 
 function printGraphQLFormattedErrorLocations(
   error: GraphQLFormattedError,
@@ -20,7 +23,7 @@ function printRuleFormattedError(error: RuleFormattedError) {
   return `${printGraphQLFormattedErrorLocations(error)}${error.message}\nProblematic paths:\n- ${error.operationCoordinates.slice(0, 10).join("\n- ")}${error.operationCoordinates.length > 10 ? "\n- ..." : ""}`;
 }
 
-export function printResults(result: CheckOperationsResult, detailed = false) {
+export function printResults(result: CheckOperationsResult, _detailed = false) {
   const results = result.resultsBySourceName;
   const parts = Object.entries(results)
     .sort((a, z) => a[0].localeCompare(z[0], "en-US"))

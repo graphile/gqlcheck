@@ -11,7 +11,7 @@ export function generateBaseline(
     version: 1,
     operations: {},
   };
-  for (const [sourceName, { output }] of Object.entries(resultsBySourceName)) {
+  for (const [_sourceName, { output }] of Object.entries(resultsBySourceName)) {
     const { errors } = output;
     for (const error of errors) {
       if ("infraction" in error) {

@@ -4,17 +4,18 @@ import type {
   ASTVisitor,
   FragmentDefinitionNode,
   GraphQLOutputType,
-  OperationDefinitionNode} from "graphql";
+  OperationDefinitionNode,
+} from "graphql";
 import {
   GraphQLList,
   GraphQLNonNull,
   isCompositeType,
   isNamedType,
-  Kind
+  Kind,
 } from "graphql";
 
-import { RuleError } from "./ruleError";
-import type { RulesContext } from "./rulesContext";
+import { RuleError } from "./ruleError.js";
+import type { RulesContext } from "./rulesContext.js";
 
 interface DepthInfo {
   current: number;
@@ -290,13 +291,13 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
 
   return {
     Document: {
-      enter(node) {
+      enter(_node) {
         if (!state.complete) {
           console.warn("Previous DepthVisitor didn't complete cleanly");
         }
         state = newState();
       },
-      leave(node) {
+      leave(_node) {
         // Finalize depths by applying all the fragment depths to the operations
         const resolvedOperations = resolveRoots(state);
         const resolvedPreset = context.getResolvedPreset();
@@ -440,7 +441,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         currentRoot = newRoot(node);
         state.roots.push(currentRoot);
       },
-      leave(node) {
+      leave(_node) {
         currentRoot = null;
       },
     },
@@ -454,7 +455,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         currentRoot = newRoot(node);
         state.roots.push(currentRoot);
       },
-      leave(node) {
+      leave(_node) {
         currentRoot = null;
       },
     },
@@ -493,7 +494,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
           // Visiting same fragment again; ignore
         }
       },
-      leave(node) {
+      leave(_node) {
         // No specific action required
       },
     },

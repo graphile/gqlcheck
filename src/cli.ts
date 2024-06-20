@@ -6,11 +6,11 @@ import { parseArgs } from "node:util";
 import JSON5 from "json5";
 import { kjsonlLines } from "kjsonl";
 
-import { filterBaseline, generateBaseline } from "./baseline";
-import type { SourceLike } from "./interfaces";
-import { checkOperations } from "./main";
+import { filterBaseline, generateBaseline } from "./baseline.js";
+import type { SourceLike } from "./interfaces.js";
+import { checkOperations } from "./main.js";
 import { printResults } from "./print.js";
-import { version } from "./version";
+import { version } from "./version.js";
 
 const parseArgsConfig = {
   options: {
