@@ -28,7 +28,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x, 20.x]
-        graphql-version: [15.x, 16.x, ^17.0.0-alpha.3]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +38,12 @@ jobs:
           cache: "npm"
       - run: yarn
       - run: yarn build
-      # We must build BEFORE we replace the GraphQL version (because otherwise the types don't match)
-      - run: yarn add graphql@${{ matrix.graphql-version }}
-      - run: yarn test
+
+      - name: "Test"
+        run: yarn test
+
+      - name: "Test with GraphQL 15"
+        run: yarn add graphql@15.x && yarn test
+
+      - name: "Test with GraphQL 17"
+        run: yarn add graphql@^17.0.0-alpha.3 && yarn test
