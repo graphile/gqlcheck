@@ -22,6 +22,15 @@ module.exports = {
     "no-restricted-syntax": "off",
     "no-await-in-loop": "off",
     "tsdoc/syntax": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        args: "after-used",
+        ignoreRestSiblings: true,
+      },
+    ],
 
     /*
      * simple-import-sort seems to be the most stable import sorting currently,

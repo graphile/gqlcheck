@@ -1,7 +1,7 @@
 import * as assert from "node:assert";
 
 import type { ASTNode } from "graphql";
-import { getNamedType, getNullableType, Kind, TypeInfo } from "graphql";
+import { Kind, TypeInfo } from "graphql";
 
 export class TypeAndOperationPathInfo extends TypeInfo {
   operationPathParts: string[] = [];
