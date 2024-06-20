@@ -24,6 +24,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: yarn
-    - run: yarn install graphql@${{ matrix.graphql-version }}
     - run: yarn build
+    # We must build BEFORE we replace the GraphQL version (because otherwise the types don't match)
+    - run: yarn install graphql@${{ matrix.graphql-version }}
     - run: yarn test
