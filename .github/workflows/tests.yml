@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -7,7 +7,22 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: "npm"
+      - run: yarn
+      # We need to build for linting due to `import` checks in `__tests__` files
+      - run: yarn build
+      - run: yarn lint
+
+  tests:
     runs-on: ubuntu-latest
 
     strategy:
