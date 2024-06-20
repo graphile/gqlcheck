@@ -1,10 +1,5 @@
-import type {
-  DocumentNode,
-  GraphQLError,
-  GraphQLSchema} from "graphql";
-import {
-  ValidationContext,
-} from "graphql";
+import type { DocumentNode, GraphQLError, GraphQLSchema } from "graphql";
+import { ValidationContext } from "graphql";
 
 import type { TypeAndOperationPathInfo } from "./operationPaths";
 import type { RuleError } from "./ruleError";
