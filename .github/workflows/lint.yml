@@ -18,4 +18,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: yarn
+      # We need to build for linting due to `import` checks in `__tests__` files
+      - run: yarn build
       - run: yarn lint
