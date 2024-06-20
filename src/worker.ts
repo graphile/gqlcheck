@@ -1,10 +1,12 @@
-import { isMainThread, parentPort, workerData } from "node:worker_threads";
 import { readFileSync } from "node:fs";
+import { isMainThread, parentPort, workerData } from "node:worker_threads";
+
+import { resolvePresets } from "graphile-config";
+import { loadConfig } from "graphile-config/load";
+import type { GraphQLError, GraphQLFormattedError } from "graphql";
 import {
   buildASTSchema,
   formatError,
-  GraphQLError,
-  GraphQLFormattedError,
   Kind,
   parse,
   Source,
@@ -14,19 +16,18 @@ import {
   visitInParallel,
   visitWithTypeInfo,
 } from "graphql";
-import {
+
+import { DepthVisitor } from "./DepthVisitor.js";
+import type {
   CheckDocumentOperationResult,
-  CheckDocumentRequest,
   CheckDocumentOutput,
+  CheckDocumentRequest,
   RuleFormattedError,
   WorkerData,
-} from "./interfaces";
-import { loadConfig } from "graphile-config/load";
-import { resolvePresets } from "graphile-config";
-import { TypeAndOperationPathInfo } from "./operationPaths";
-import { RulesContext } from "./rulesContext";
-import { DepthVisitor } from "./DepthVisitor";
-import { RuleError } from "./ruleError";
+} from "./interfaces.js";
+import { TypeAndOperationPathInfo } from "./operationPaths.js";
+import type { RuleError } from "./ruleError.js";
+import { RulesContext } from "./rulesContext.js";
 
 if (isMainThread) {
   throw new Error(

@@ -1,10 +1,7 @@
-import {
-  version as GraphQLVersion,
-  formatError,
-  GraphQLError,
-  GraphQLErrorOptions,
-} from "graphql";
-import { RuleFormattedError } from "./interfaces";
+import type { GraphQLErrorOptions } from "graphql";
+import { formatError, GraphQLError, version as GraphQLVersion } from "graphql";
+
+import type { RuleFormattedError } from "./interfaces";
 
 const graphqlMajor = parseInt(GraphQLVersion.split(".")[0], 10);
 
@@ -20,11 +17,9 @@ export class RuleError extends GraphQLError {
   options!: RuleErrorOptions;
   constructor(message: string, options: RuleErrorOptions) {
     if (graphqlMajor < 16) {
-      // @ts-ignore
       const { nodes, source, positions, path, originalError, extensions } =
         options;
       // message, nodes, source, positions, path, originalError, extensions
-      // @ts-ignore
       super(message, nodes, source, positions, path, originalError, extensions);
     } else {
       super(message, options);

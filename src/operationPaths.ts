@@ -1,11 +1,7 @@
 import * as assert from "node:assert";
-import {
-  Kind,
-  TypeInfo,
-  getNamedType,
-  getNullableType,
-  ASTNode,
-} from "graphql";
+
+import type { ASTNode } from "graphql";
+import { Kind, TypeInfo } from "graphql";
 
 export class TypeAndOperationPathInfo extends TypeInfo {
   operationPathParts: string[] = [];
@@ -103,15 +99,15 @@ export class TypeAndOperationPathInfo extends TypeInfo {
         break;
       }
       case Kind.LIST: {
-        const listType: unknown = getNullableType(this.getInputType());
+        //const listType: unknown = getNullableType(this.getInputType());
         break;
       }
       case Kind.OBJECT_FIELD: {
-        const objectType: unknown = getNamedType(this.getInputType());
+        //const objectType: unknown = getNamedType(this.getInputType());
         break;
       }
       case Kind.ENUM: {
-        const enumType: unknown = getNamedType(this.getInputType());
+        //const enumType: unknown = getNamedType(this.getInputType());
         break;
       }
     }
@@ -146,15 +142,15 @@ export class TypeAndOperationPathInfo extends TypeInfo {
         break;
       }
       case Kind.LIST: {
-        const listType: unknown = getNullableType(this.getInputType());
+        //const listType: unknown = getNullableType(this.getInputType());
         break;
       }
       case Kind.OBJECT_FIELD: {
-        const objectType: unknown = getNamedType(this.getInputType());
+        //const objectType: unknown = getNamedType(this.getInputType());
         break;
       }
       case Kind.ENUM: {
-        const enumType: unknown = getNamedType(this.getInputType());
+        //const enumType: unknown = getNamedType(this.getInputType());
         break;
       }
     }

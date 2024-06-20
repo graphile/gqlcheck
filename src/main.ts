@@ -1,27 +1,31 @@
-import JSON5 from "json5";
-import { resolvePresets } from "graphile-config";
-import { Worker } from "node:worker_threads";
+import { readFile } from "node:fs/promises";
 import * as os from "node:os";
-import {
-  CheckDocumentRequest,
+import { Worker } from "node:worker_threads";
+
+import { resolvePresets } from "graphile-config";
+import { loadConfig } from "graphile-config/load";
+import JSON5 from "json5";
+
+import { filterBaseline } from "./baseline.js";
+import type {
+  Baseline,
   CheckDocumentOutput,
-  WorkerData,
+  CheckDocumentRequest,
+  CheckOperationsResult,
   SourceLike,
   SourceResultsBySourceName,
-  CheckOperationsResult,
-  Baseline,
-} from "./interfaces";
-import { loadConfig } from "graphile-config/load";
-import { readFile } from "node:fs/promises";
-import { filterBaseline } from "./baseline";
+  WorkerData,
+} from "./interfaces.js";
 
 type Deferred<T> = Promise<T> & {
   resolve: (value: T | PromiseLike<T>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   reject: (reason?: any) => void;
 };
 
 function defer<T>(): Deferred<T> {
   let resolve!: (value: T | PromiseLike<T>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let reject!: (reason?: any) => void;
   return Object.assign(
     new Promise<T>((_resolve, _reject) => {
@@ -160,7 +164,7 @@ export async function checkOperations(
   ): Promise<Task<TRequest, TResult>> {
     const resultPromise = defer<TResult>();
     const worker = await _getFreeWorker();
-    const handleResponse = (message: any) => {
+    const handleResponse = (message: TResult) => {
       worker.off("message", handleResponse);
       _returnWorker(worker);
       resultPromise.resolve(message);

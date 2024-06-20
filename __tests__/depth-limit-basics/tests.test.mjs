@@ -1,11 +1,12 @@
 // @ts-check
 
+import { it } from "node:test";
+
 import {
   checkOperations,
   filterBaseline,
   generateBaseline,
 } from "../../dist/index.js";
-import { it } from "node:test";
 import { getDirHelpers } from "../common.mjs";
 
 const __dirname = new URL(".", import.meta.url).pathname;

@@ -1,12 +1,12 @@
+export { filterBaseline, generateBaseline } from "./baseline.js";
 export {
+  Baseline,
+  CheckOperationsResult,
   SourceLike,
   SourceResultsBySourceName as SourceResultBySourceName,
-  CheckOperationsResult,
-  Baseline,
 } from "./interfaces.js";
 export { checkOperations } from "./main.js";
 export { printResults } from "./print.js";
-export { filterBaseline, generateBaseline } from "./baseline.js";
 
 declare global {
   namespace GraphileConfig {

@@ -1,13 +1,16 @@
 #!/usr/bin/env node
+import { open, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import type { ParseArgsConfig } from "node:util";
+import { parseArgs } from "node:util";
+
 import JSON5 from "json5";
-import { parseArgs, ParseArgsConfig } from "node:util";
-import { checkOperations } from "./main";
-import { open, readdir, stat, readFile, writeFile } from "node:fs/promises";
 import { kjsonlLines } from "kjsonl";
-import { SourceLike } from "./interfaces";
+
+import { filterBaseline, generateBaseline } from "./baseline.js";
+import type { SourceLike } from "./interfaces.js";
+import { checkOperations } from "./main.js";
 import { printResults } from "./print.js";
-import { filterBaseline, generateBaseline } from "./baseline";
-import { version } from "./version";
+import { version } from "./version.js";
 
 const parseArgsConfig = {
   options: {

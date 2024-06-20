@@ -1,9 +1,10 @@
 // @ts-check
 
-import { diff } from "jest-diff";
 import assert from "assert";
 import { readdir, readFile, writeFile } from "fs/promises";
+import { diff } from "jest-diff";
 import JSON5 from "json5";
+
 import { printResults } from "../dist/index.js";
 
 /** @import { SourceLike, CheckOperationsResult } from '../dist/index.js' */
