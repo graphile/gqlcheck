@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { isMainThread, parentPort, workerData } from "node:worker_threads";
 
-import { resolvePresets } from "graphile-config";
+import { Middleware, orderedApply, resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
 import type { GraphQLError, GraphQLFormattedError } from "graphql";
 import {
@@ -52,6 +52,15 @@ async function main() {
   const {
     gqlcheck: { schemaSdlPath = `${process.cwd()}/schema.graphql` } = {},
   } = config;
+
+  const middleware = new Middleware<GraphileConfig.GqlcheckMiddleware>();
+  orderedApply(
+    config.plugins,
+    (p) => p.gqlcheck?.middleware,
+    (name, fn, _plugin) => {
+      middleware.register(name, fn as any);
+    },
+  );
 
   const schemaString = readFileSync(schemaSdlPath, "utf8");
   const schema = buildASTSchema(parse(schemaString));
@@ -128,15 +137,17 @@ async function main() {
     if (req === "STOP") {
       process.exit(0);
     }
-    checkDocument(req).then(
-      (result) => {
-        definitelyParentPort.postMessage(result);
-      },
-      (e) => {
-        console.dir(e);
-        process.exit(1);
-      },
-    );
+    middleware
+      .run("checkDocument", { req }, ({ req }) => checkDocument(req))
+      .then(
+        (result) => {
+          definitelyParentPort.postMessage(result);
+        },
+        (e) => {
+          console.dir(e);
+          process.exit(1);
+        },
+      );
   });
 
   definitelyParentPort.postMessage("READY");

@@ -59,3 +59,7 @@ export interface Baseline {
       | undefined;
   };
 }
+
+export interface CheckDocumentEvent {
+  req: CheckDocumentRequest;
+}
