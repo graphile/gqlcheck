@@ -1,5 +1,6 @@
-import { GraphQLFormattedError } from "graphql";
-import { RuleFormattedError, CheckOperationsResult } from "./interfaces.js";
+import type { GraphQLFormattedError } from "graphql";
+
+import type { CheckOperationsResult,RuleFormattedError } from "./interfaces.js";
 
 function printGraphQLFormattedErrorLocations(
   error: GraphQLFormattedError,

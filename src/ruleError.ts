@@ -1,10 +1,11 @@
+import type {
+  GraphQLErrorOptions} from "graphql";
 import {
-  version as GraphQLVersion,
   formatError,
   GraphQLError,
-  GraphQLErrorOptions,
-} from "graphql";
-import { RuleFormattedError } from "./interfaces";
+  version as GraphQLVersion} from "graphql";
+
+import type { RuleFormattedError } from "./interfaces";
 
 const graphqlMajor = parseInt(GraphQLVersion.split(".")[0], 10);
 

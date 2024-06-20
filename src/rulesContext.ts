@@ -1,11 +1,13 @@
-import {
+import type {
   DocumentNode,
   GraphQLError,
-  GraphQLSchema,
+  GraphQLSchema} from "graphql";
+import {
   ValidationContext,
 } from "graphql";
-import { TypeAndOperationPathInfo } from "./operationPaths";
-import { RuleError } from "./ruleError";
+
+import type { TypeAndOperationPathInfo } from "./operationPaths";
+import type { RuleError } from "./ruleError";
 
 export class RulesContext extends ValidationContext {
   constructor(

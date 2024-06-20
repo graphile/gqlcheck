@@ -1,19 +1,21 @@
-import JSON5 from "json5";
-import { resolvePresets } from "graphile-config";
-import { Worker } from "node:worker_threads";
+import { readFile } from "node:fs/promises";
 import * as os from "node:os";
-import {
-  CheckDocumentRequest,
+import { Worker } from "node:worker_threads";
+
+import { resolvePresets } from "graphile-config";
+import { loadConfig } from "graphile-config/load";
+import JSON5 from "json5";
+
+import { filterBaseline } from "./baseline";
+import type {
+  Baseline,
   CheckDocumentOutput,
-  WorkerData,
+  CheckDocumentRequest,
+  CheckOperationsResult,
   SourceLike,
   SourceResultsBySourceName,
-  CheckOperationsResult,
-  Baseline,
+  WorkerData,
 } from "./interfaces";
-import { loadConfig } from "graphile-config/load";
-import { readFile } from "node:fs/promises";
-import { filterBaseline } from "./baseline";
 
 type Deferred<T> = Promise<T> & {
   resolve: (value: T | PromiseLike<T>) => void;

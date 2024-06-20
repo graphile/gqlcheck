@@ -1,10 +1,12 @@
 import * as assert from "node:assert";
+
+import type {
+  ASTNode} from "graphql";
 import {
-  Kind,
-  TypeInfo,
   getNamedType,
   getNullableType,
-  ASTNode,
+  Kind,
+  TypeInfo,
 } from "graphql";
 
 export class TypeAndOperationPathInfo extends TypeInfo {

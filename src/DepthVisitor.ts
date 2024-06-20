@@ -1,17 +1,20 @@
 import * as assert from "node:assert";
-import {
+
+import type {
   ASTVisitor,
   FragmentDefinitionNode,
+  GraphQLOutputType,
+  OperationDefinitionNode} from "graphql";
+import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLOutputType,
   isCompositeType,
   isNamedType,
-  Kind,
-  OperationDefinitionNode,
+  Kind
 } from "graphql";
-import { RulesContext } from "./rulesContext";
+
 import { RuleError } from "./ruleError";
+import type { RulesContext } from "./rulesContext";
 
 interface DepthInfo {
   current: number;
