@@ -174,7 +174,7 @@ async function main() {
     }
 
     if (mode === 0) {
-      // Need to revisit
+      // Need to revisit, because OperationPathsVisitor didn't run above.
       visit(
         document,
         visitWithTypeInfo(
