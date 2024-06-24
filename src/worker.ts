@@ -13,6 +13,7 @@ import {
   specifiedRules,
   validate,
   validateSchema,
+  version as graphqlVersion,
   visit,
   visitInParallel,
   visitWithTypeInfo,
@@ -30,6 +31,8 @@ import { TypeAndOperationPathInfo } from "./operationPaths.js";
 import { OperationPathsVisitor } from "./OperationPathsVisitor.js";
 import type { RuleError } from "./ruleError.js";
 import { RulesContext } from "./rulesContext.js";
+
+const graphqlVersionMajor = parseInt(graphqlVersion.split(".")[0], 10);
 
 if (isMainThread) {
   throw new Error(
@@ -111,19 +114,30 @@ async function main() {
       config,
       onError,
     );
-
-    const baseValidationRules = [
-      ...specifiedRules,
+    const baseValidationRules = [...specifiedRules];
+    const mode =
+      graphqlVersionMajor === 15 ? 1 : graphqlVersionMajor === 16 ? 2 : 0;
+    if (mode > 0) {
       // We need to run this so we know what the operation path/operation names are for rule errors.
-      () => OperationPathsVisitor(rulesContext),
-    ];
-    const validationErrors = validate(
-      schema,
-      document,
-      baseValidationRules,
-      {},
-      typeInfo,
-    );
+      baseValidationRules.push(() => OperationPathsVisitor(rulesContext));
+    }
+
+    const validationErrors =
+      mode === 1
+        ? // GraphQL v15 style
+          validate(
+            schema,
+            document,
+            baseValidationRules,
+            typeInfo as any,
+            {} as any,
+          )
+        : mode === 2
+          ? // GraphQL v16 style
+            validate(schema, document, baseValidationRules, {}, typeInfo)
+          : // GraphQL v17 MIGHT remove typeInfo
+            validate(schema, document, baseValidationRules);
+
     if (validationErrors.length > 0) {
       return {
         sourceName,
@@ -135,6 +149,17 @@ async function main() {
             formatError(e),
         ),
       };
+    }
+
+    if (mode === 0) {
+      // Need to revisit
+      visit(
+        document,
+        visitWithTypeInfo(
+          rulesContext.getTypeInfo(),
+          visitInParallel([OperationPathsVisitor(rulesContext)]),
+        ),
+      );
     }
 
     const visitors = await middleware.run(
