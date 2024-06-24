@@ -10,6 +10,7 @@ import {
   Kind,
   parse,
   Source,
+  specifiedRules,
   validate,
   validateSchema,
   visit,
@@ -26,6 +27,7 @@ import type {
   WorkerData,
 } from "./interfaces.js";
 import { TypeAndOperationPathInfo } from "./operationPaths.js";
+import { OperationPathsVisitor } from "./OperationPathsVisitor.js";
 import type { RuleError } from "./ruleError.js";
 import { RulesContext } from "./rulesContext.js";
 
@@ -89,20 +91,16 @@ async function main() {
       };
     }
 
-    // TODO: regular validation
-    const validationErrors = validate(schema, document);
-    if (validationErrors.length > 0) {
-      return {
-        sourceName,
-        operations: [],
-        errors: validationErrors.map((e) => e.toJSON?.() ?? formatError(e)),
-      };
-    }
-
     const typeInfo = new TypeAndOperationPathInfo(schema);
     const errors: (RuleFormattedError | GraphQLFormattedError)[] = [];
-    function onError(error: RuleError | GraphQLError) {
-      errors.push(error.toJSON?.() ?? formatError(error));
+    function onError(
+      error: RuleError | (GraphQLError & { toJSONEnhanced?: undefined }),
+    ) {
+      errors.push(
+        error.toJSONEnhanced?.(rulesContext) ??
+          error.toJSON?.() ??
+          formatError(error),
+      );
     }
     const rulesContext = new RulesContext(
       schema,
@@ -111,16 +109,40 @@ async function main() {
       config,
       onError,
     );
+
+    const baseValidationRules = [
+      ...specifiedRules,
+      // We need to run this so we know what the operation path/operation names are for rule errors.
+      () => OperationPathsVisitor(rulesContext),
+    ];
+    const validationErrors = validate(
+      schema,
+      document,
+      baseValidationRules,
+      {},
+      typeInfo,
+    );
+    if (validationErrors.length > 0) {
+      return {
+        sourceName,
+        operations: [],
+        errors: validationErrors.map((e) => e.toJSON?.() ?? formatError(e)),
+      };
+    }
+
     const visitors = await middleware.run(
       "visitors",
-      { typeInfo, visitors: [DepthVisitor(rulesContext)] },
+      { rulesContext, visitors: [DepthVisitor(rulesContext)] },
       ({ visitors }) => visitors,
     );
     const visitor = await middleware.run(
       "createVisitor",
-      { typeInfo, visitors },
-      ({ typeInfo, visitors }) =>
-        visitWithTypeInfo(typeInfo, visitInParallel(visitors)),
+      { rulesContext, visitors },
+      ({ rulesContext, visitors }) =>
+        visitWithTypeInfo(
+          rulesContext.getTypeInfo(),
+          visitInParallel(visitors),
+        ),
     );
     visit(document, visitor);
 
@@ -159,7 +181,6 @@ async function main() {
         },
       );
   });
-
   definitelyParentPort.postMessage("READY");
 }
 

@@ -1,6 +1,7 @@
 import * as assert from "node:assert";
 
 import type {
+  ASTNode,
   ASTVisitor,
   FragmentDefinitionNode,
   GraphQLOutputType,
@@ -20,14 +21,14 @@ import type { RulesContext } from "./rulesContext.js";
 interface DepthInfo {
   current: number;
   max: number;
-  coordsByDepth: Map<number, string[]>;
+  nodesByDepth: Map<number, ASTNode[]>;
 }
 
 function newDepthInfo(): DepthInfo {
   return {
     current: 0,
     max: 0,
-    coordsByDepth: new Map(),
+    nodesByDepth: new Map(),
   };
 }
 
@@ -126,7 +127,7 @@ function resolveFragment(
   try {
     // Step 1: add all the fragments own depths
     for (const key of Object.keys(fragmentRoot.depths) as (keyof Depths)[]) {
-      const { max: fragMax, coordsByDepth: fragCoordsByDepth } =
+      const { max: fragMax, nodesByDepth: fragNodesByDepth } =
         fragmentRoot.depths[key]!;
       if (!depths[key]) {
         depths[key] = newDepthInfo();
@@ -135,15 +136,15 @@ function resolveFragment(
       if (adjustedMax > depths[key].max) {
         depths[key].max = adjustedMax;
       }
-      for (const [fragDepth, fragCoords] of fragCoordsByDepth) {
-        const transformedCoords = fragCoords.map((c) => `${operationPath}${c}`);
+      for (const [fragDepth, fragNodes] of fragNodesByDepth) {
+        //const transformedCoords = fragNodes.map((c) => `${operationPath}${c}`);
         const depth = depths[key].current + fragDepth;
-        const list = depths[key].coordsByDepth.get(depth);
+        const list = depths[key].nodesByDepth.get(depth);
         if (list) {
           // More performant than list.push(...transformedCoords)
-          transformedCoords.forEach((c) => list.push(c));
+          fragNodes.forEach((c) => list.push(c));
         } else {
-          depths[key].coordsByDepth.set(depth, transformedCoords);
+          depths[key].nodesByDepth.set(depth, [...fragNodes]);
         }
       }
     }
@@ -211,9 +212,7 @@ function resolveOperationRoot(
       depths[key] = newDepthInfo();
     }
     depths[key].max = operationRoot.depths[key]!.max;
-    depths[key].coordsByDepth = new Map(
-      operationRoot.depths[key]!.coordsByDepth,
-    );
+    depths[key].nodesByDepth = new Map(operationRoot.depths[key]!.nodesByDepth);
   }
   traverseFragmentReferences(
     fragmentRootByName,
@@ -251,7 +250,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
   let state: State = newState();
   state.complete = true;
   let currentRoot: Root | null = null;
-  function incDepth<TKey extends keyof Depths>(key: TKey) {
+  function incDepth<TKey extends keyof Depths>(key: TKey, node: ASTNode) {
     if (!currentRoot) {
       throw new Error(
         `DepthVisitor attempted to increment depth, but there's no currentRoot!`,
@@ -265,13 +264,9 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
     const { current, max } = currentRoot.depths[key];
     if (current > max) {
       currentRoot.depths[key].max = current;
-      currentRoot.depths[key].coordsByDepth.set(current, [
-        context.getOperationPath(),
-      ]);
+      currentRoot.depths[key].nodesByDepth.set(current, [node]);
     } else if (current === max) {
-      currentRoot.depths[key].coordsByDepth
-        .get(current)!
-        .push(context.getOperationPath());
+      currentRoot.depths[key].nodesByDepth.get(current)!.push(node);
     }
   }
 
@@ -346,7 +341,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
 
           // Now see if we've exceeded the limits
           for (const key of Object.keys(resolvedOperation.depths)) {
-            const { max, coordsByDepth } = resolvedOperation.depths[key]!;
+            const { max, nodesByDepth } = resolvedOperation.depths[key]!;
             const selfReferential = key.includes(".");
             const [limit, override, infraction, label] = ((): [
               limit: number,
@@ -406,18 +401,15 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
               }
             })();
             if (max > limit) {
-              const operationCoordinates: string[] = [];
+              const nodes: ASTNode[] = [];
               for (let i = limit + 1; i <= max; i++) {
-                coordsByDepth
-                  .get(i)
-                  ?.forEach((c) => operationCoordinates.push(c));
+                nodesByDepth.get(i)?.forEach((c) => nodes.push(c));
               }
               const error = new RuleError(
                 `${label} exceeded: ${max} > ${limit}`,
                 {
                   infraction,
-                  operationName,
-                  operationCoordinates,
+                  nodes,
                   override,
                 },
               );
@@ -506,13 +498,15 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         if (!parentType) return;
         const { namedType, listDepth } = processType(returnType);
         if (isCompositeType(namedType)) {
-          incDepth(`${parentType.name}.${node.name.value}`);
+          incDepth(`${parentType.name}.${node.name.value}`, node);
           incDepth(
             context.isIntrospection() ? "introspectionFields" : "fields",
+            node,
           );
           for (let i = 0; i < listDepth; i++) {
             incDepth(
               context.isIntrospection() ? "introspectionLists" : "lists",
+              node,
             );
           }
         }

@@ -1,12 +1,12 @@
-import "graphile-config";
-import { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
-import {
+import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
+import type { ASTVisitor } from "graphql";
+
+import type {
   CheckDocumentEvent,
   CheckDocumentOutput,
   CreateVisitorEvent,
   VisitorsEvent,
 } from "./interfaces.js";
-import { ASTVisitor } from "graphql";
 
 export { filterBaseline, generateBaseline } from "./baseline.js";
 export {
@@ -17,6 +17,8 @@ export {
 } from "./interfaces.js";
 export { checkOperations } from "./main.js";
 export { printResults } from "./print.js";
+export { RuleError } from "./ruleError.js";
+export { RulesContext } from "./rulesContext.js";
 
 declare global {
   namespace GraphileConfig {

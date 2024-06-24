@@ -16,20 +16,23 @@ export function generateBaseline(
     for (const error of errors) {
       if ("infraction" in error) {
         // Rule error
-        const { operationName, infraction, operationCoordinates } = error;
-        if (!operationName) continue;
-        if (!baseline.operations[operationName]) {
-          baseline.operations[operationName] = {
-            ignoreCoordinatesByRule: Object.create(null),
-          };
-        }
-        const op = baseline.operations[operationName];
-        if (!op.ignoreCoordinatesByRule[infraction]) {
-          op.ignoreCoordinatesByRule[infraction] = [];
-        }
-        const ignores = op.ignoreCoordinatesByRule[infraction];
-        for (const coord of operationCoordinates) {
-          ignores.push(coord);
+        const { operationNames, infraction, operationCoordinates } = error;
+        if (!operationNames) continue;
+        for (const operationName of operationNames) {
+          if (!operationName) continue;
+          if (!baseline.operations[operationName]) {
+            baseline.operations[operationName] = {
+              ignoreCoordinatesByRule: Object.create(null),
+            };
+          }
+          const op = baseline.operations[operationName];
+          if (!op.ignoreCoordinatesByRule[infraction]) {
+            op.ignoreCoordinatesByRule[infraction] = [];
+          }
+          const ignores = op.ignoreCoordinatesByRule[infraction];
+          for (const coord of operationCoordinates) {
+            ignores.push(coord);
+          }
         }
       }
     }
@@ -49,20 +52,18 @@ function filterOutput(
       if ("infraction" in e) {
         const {
           infraction,
-          operationName,
+          operationNames,
           operationCoordinates: rawCoords,
         } = e;
-        if (!operationName) {
+        if (!operationNames) {
           return e;
         }
-        if (!baseline.operations[operationName]) {
-          return e;
-        }
-        const ignores =
-          baseline.operations[operationName].ignoreCoordinatesByRule[
-            infraction
-          ];
-        if (!ignores) {
+        const ignores = operationNames.flatMap((n) =>
+          n
+            ? baseline.operations[n]?.ignoreCoordinatesByRule[infraction] ?? []
+            : [],
+        );
+        if (ignores.length === 0) {
           return e;
         }
         const operationCoordinates = rawCoords.filter(

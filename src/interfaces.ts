@@ -1,5 +1,7 @@
 import type { ASTVisitor, GraphQLFormattedError } from "graphql";
+
 import { TypeAndOperationPathInfo } from "./operationPaths";
+import type { RulesContext } from "./rulesContext";
 
 export interface WorkerData {
   configPath: string | null | undefined;
@@ -36,8 +38,8 @@ export interface SourceResultsBySourceName {
 
 export interface RuleFormattedError extends GraphQLFormattedError {
   infraction: string;
-  operationName: string | undefined;
-  operationCoordinates: string[];
+  operationNames: ReadonlyArray<string | undefined>;
+  operationCoordinates: ReadonlyArray<string>;
   override: GraphileConfig.GraphQLCheckConfig;
 }
 
@@ -65,10 +67,10 @@ export interface CheckDocumentEvent {
   req: CheckDocumentRequest;
 }
 export interface VisitorsEvent {
-  typeInfo: TypeAndOperationPathInfo;
+  rulesContext: RulesContext;
   visitors: ASTVisitor[];
 }
 export interface CreateVisitorEvent {
-  typeInfo: TypeAndOperationPathInfo;
+  rulesContext: RulesContext;
   visitors: ASTVisitor[];
 }
