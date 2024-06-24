@@ -1,6 +1,5 @@
 import type { ASTVisitor, GraphQLFormattedError } from "graphql";
 
-import { TypeAndOperationPathInfo } from "./operationPaths";
 import type { RulesContext } from "./rulesContext";
 
 export interface WorkerData {

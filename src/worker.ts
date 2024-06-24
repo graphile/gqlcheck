@@ -60,6 +60,7 @@ async function main() {
     config.plugins,
     (p) => p.gqlcheck?.middleware,
     (name, fn, _plugin) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       middleware.register(name, fn as any);
     },
   );

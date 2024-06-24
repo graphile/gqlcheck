@@ -15,7 +15,6 @@ import {
   Kind,
 } from "graphql";
 
-import { ErrorOperationLocation } from "./interfaces.js";
 import { RuleError } from "./ruleError.js";
 import type { RulesContext } from "./rulesContext.js";
 

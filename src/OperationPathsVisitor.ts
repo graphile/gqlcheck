@@ -1,4 +1,4 @@
-import { type ASTVisitor, Kind } from "graphql";
+import type { ASTVisitor } from "graphql";
 
 import type { RulesContext } from "./rulesContext";
 
