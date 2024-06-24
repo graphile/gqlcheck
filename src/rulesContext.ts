@@ -9,6 +9,7 @@ import type {
 } from "graphql";
 import { Kind, ValidationContext } from "graphql";
 
+import type { ErrorOperationLocation } from "./interfaces";
 import type { TypeAndOperationPathInfo } from "./operationPaths";
 import type { RuleError } from "./ruleError";
 
@@ -34,7 +35,12 @@ export class RulesContext extends ValidationContext {
   isIntrospection() {
     return this.typeInfo.isIntrospection();
   }
-  operationPathByNode = new Map<ASTNode, string>();
+  // Operation path but only relative to the root (which could be a fragment)
+  subPathByNode = new Map<ASTNode, string>();
+  operationPathsByNodeByOperation = new Map<
+    OperationDefinitionNode,
+    Map<ASTNode, string[]>
+  >();
   operationNamesByNode = new Map<ASTNode, Array<string | undefined>>();
 
   _fragmentsByRoot = new Map<
@@ -76,15 +82,21 @@ export class RulesContext extends ValidationContext {
       }
       list.push(node);
     }
-    this.operationPathByNode.set(node, this.typeInfo.getOperationPath());
+    this.subPathByNode.set(node, this.typeInfo.getOperationPath());
   }
   initLeaveNode(node: ASTNode) {
     if (node.kind === Kind.DOCUMENT) {
       // Finalize
       for (const operationDefinition of this._operationDefinitions) {
         const operationName = operationDefinition.name?.value;
+        const operationPathsByNode: Map<ASTNode, string[]> = new Map();
+        this.operationPathsByNodeByOperation.set(
+          operationDefinition,
+          operationPathsByNode,
+        );
         const walk = (
           root: OperationDefinitionNode | FragmentDefinitionNode,
+          path: string,
           visited: Set<OperationDefinitionNode | FragmentDefinitionNode>,
         ) => {
           // This runs before we've ensured there's no cycles, so we must protect ourself
@@ -102,6 +114,16 @@ export class RulesContext extends ValidationContext {
                 this.operationNamesByNode.set(node, list);
               }
               list.push(operationName);
+              const subpath = this.subPathByNode.get(node);
+              if (subpath != null) {
+                const fullPath = path + subpath;
+                let list = operationPathsByNode.get(node);
+                if (!list) {
+                  list = [];
+                  operationPathsByNode.set(node, list);
+                }
+                list.push(fullPath);
+              }
             }
           }
           const fragSpreads = this._fragmentsByRoot.get(root);
@@ -111,46 +133,62 @@ export class RulesContext extends ValidationContext {
                 (d) => d.name.value === fragSpread.name.value,
               );
               if (frag) {
-                walk(frag, visited);
+                const subpath = this.subPathByNode.get(fragSpread);
+                const fullPath = path + subpath + ">";
+                walk(frag, fullPath, visited);
               }
             }
           }
           visited.delete(root);
         };
-        walk(operationDefinition, new Set());
+        walk(operationDefinition, "", new Set());
       }
     }
   }
-  getOperationNamesAndCoordinatesForNodes(
+  getErrorOperationLocationsForNodes(
     nodes: readonly ASTNode[] | undefined,
-  ): {
-    operationNames: readonly (string | undefined)[];
-    operationCoordinates: string[];
-  } {
+  ): ReadonlyArray<ErrorOperationLocation> {
     if (nodes == null) {
-      console.log(`No nodes!`);
-      return {
-        operationNames: [],
-        operationCoordinates: [],
-      };
+      return [];
     }
-    const operationNames = new Set<string | undefined>();
-    const operationCoordinates = new Set<string>();
+    const map = new Map<string | undefined, Set<string>>();
     for (const node of nodes) {
       const nodeOperationNames = this.operationNamesByNode.get(node);
       if (nodeOperationNames) {
         for (const operationName of nodeOperationNames) {
-          operationNames.add(operationName);
+          let set = map.get(operationName);
+          if (!set) {
+            set = new Set();
+            map.set(operationName, set);
+          }
+          const op = this._operationDefinitions.find(
+            (o) => o.name?.value === operationName,
+          );
+          if (op) {
+            const operationPathsByNode =
+              this.operationPathsByNodeByOperation.get(op);
+            if (operationPathsByNode) {
+              const nodeOperationCoordinates = operationPathsByNode.get(node);
+              if (nodeOperationCoordinates) {
+                for (const c of nodeOperationCoordinates) {
+                  set.add(c);
+                }
+              }
+            }
+          }
         }
       }
-      const nodeOperationCoordinate = this.operationPathByNode.get(node);
-      if (nodeOperationCoordinate) {
-        operationCoordinates.add(nodeOperationCoordinate);
-      }
     }
-    return {
-      operationNames: [...operationNames],
-      operationCoordinates: [...operationCoordinates],
-    };
+    const operations: Array<{
+      operationName: string | undefined;
+      operationCoordinates: string[];
+    }> = [];
+    for (const [operationName, operationCoordinates] of map) {
+      operations.push({
+        operationName,
+        operationCoordinates: [...operationCoordinates],
+      });
+    }
+    return operations;
   }
 }

@@ -99,6 +99,7 @@ async function main() {
       errors.push(
         error.toJSONEnhanced?.(rulesContext) ??
           error.toJSON?.() ??
+          // Ignore deprecated, this is for GraphQL v15 support
           formatError(error),
       );
     }
@@ -126,7 +127,12 @@ async function main() {
       return {
         sourceName,
         operations: [],
-        errors: validationErrors.map((e) => e.toJSON?.() ?? formatError(e)),
+        errors: validationErrors.map(
+          (e) =>
+            e.toJSON?.() ??
+            // Ignore deprecated, this is for GraphQL v15 support
+            formatError(e),
+        ),
       };
     }
 

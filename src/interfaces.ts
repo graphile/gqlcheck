@@ -38,8 +38,10 @@ export interface SourceResultsBySourceName {
 
 export interface RuleFormattedError extends GraphQLFormattedError {
   infraction: string;
-  operationNames: ReadonlyArray<string | undefined>;
-  operationCoordinates: ReadonlyArray<string>;
+  operations: ReadonlyArray<{
+    operationName: string | undefined;
+    operationCoordinates: ReadonlyArray<string>;
+  }>;
   override: GraphileConfig.GraphQLCheckConfig;
 }
 
@@ -73,4 +75,8 @@ export interface VisitorsEvent {
 export interface CreateVisitorEvent {
   rulesContext: RulesContext;
   visitors: ASTVisitor[];
+}
+export interface ErrorOperationLocation {
+  operationName: string | undefined;
+  operationCoordinates: string[];
 }

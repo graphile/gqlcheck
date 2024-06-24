@@ -16,9 +16,9 @@ export function generateBaseline(
     for (const error of errors) {
       if ("infraction" in error) {
         // Rule error
-        const { operationNames, infraction, operationCoordinates } = error;
-        if (!operationNames) continue;
-        for (const operationName of operationNames) {
+        const { operations, infraction } = error;
+        if (!operations) continue;
+        for (const { operationName, operationCoordinates } of operations) {
           if (!operationName) continue;
           if (!baseline.operations[operationName]) {
             baseline.operations[operationName] = {
@@ -50,33 +50,40 @@ function filterOutput(
   const errors = rawErrors
     .map((e) => {
       if ("infraction" in e) {
-        const {
-          infraction,
-          operationNames,
-          operationCoordinates: rawCoords,
-        } = e;
-        if (!operationNames) {
+        const { infraction, operations: rawOperations } = e;
+        if (!rawOperations) {
           return e;
         }
-        const ignores = operationNames.flatMap((n) =>
-          n
-            ? baseline.operations[n]?.ignoreCoordinatesByRule[infraction] ?? []
-            : [],
-        );
-        if (ignores.length === 0) {
-          return e;
-        }
-        const operationCoordinates = rawCoords.filter(
-          (c) => !ignores.includes(c),
-        );
-        if (operationCoordinates.length === 0) {
-          // Fully ignored
+        const operations = rawOperations
+          .map((op) => {
+            const { operationName, operationCoordinates: rawCoords } = op;
+            if (operationName == null) {
+              return op;
+            }
+            const ignores =
+              baseline.operations[operationName]?.ignoreCoordinatesByRule[
+                infraction
+              ] ?? [];
+            if (ignores.length === 0) {
+              return op;
+            }
+            const operationCoordinates = rawCoords.filter(
+              (c) => !ignores.includes(c),
+            );
+            if (operationCoordinates.length === 0) {
+              // Fully ignored
+              return null;
+            }
+            op.operationCoordinates = operationCoordinates;
+            return op;
+          })
+          .filter((o) => o != null);
+        if (operations.length === 0) {
           return null;
+        } else {
+          e.operations = operations;
+          return e;
         }
-        return {
-          ...e,
-          operationCoordinates,
-        };
       } else {
         return e;
       }

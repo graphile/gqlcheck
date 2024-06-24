@@ -20,7 +20,8 @@ function printGraphQLFormattedError(error: GraphQLFormattedError) {
   return `${printGraphQLFormattedErrorLocations(error)}${error.message}`;
 }
 function printRuleFormattedError(error: RuleFormattedError) {
-  return `${printGraphQLFormattedErrorLocations(error)}${error.message}\nProblematic paths:\n- ${error.operationCoordinates.slice(0, 10).join("\n- ")}${error.operationCoordinates.length > 10 ? "\n- ..." : ""}`;
+  const opCoords = error.operations.flatMap((o) => o.operationCoordinates);
+  return `${printGraphQLFormattedErrorLocations(error)}${error.message}\nProblematic paths:\n- ${opCoords.slice(0, 10).join("\n- ")}${opCoords.length > 10 ? "\n- ..." : ""}`;
 }
 
 export function printResults(result: CheckOperationsResult, _detailed = false) {
