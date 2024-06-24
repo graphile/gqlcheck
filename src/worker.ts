@@ -117,10 +117,6 @@ async function main() {
     const validationRules = [...specifiedRules];
     const mode =
       graphqlVersionMajor === 15 ? 1 : graphqlVersionMajor === 16 ? 2 : 0;
-    if (mode > 0) {
-      // We need to run this so we know what the operation path/operation names are for rule errors.
-      validationRules.push(() => OperationPathsVisitor(rulesContext));
-    }
 
     const validationErrors = await middleware.run(
       "validate",
@@ -145,7 +141,7 @@ async function main() {
             validate(
               schema,
               document,
-              validationRules,
+              [...validationRules, () => OperationPathsVisitor(rulesContext)],
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               typeInfo as any,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -156,7 +152,7 @@ async function main() {
               validate(
                 schema,
                 document,
-                validationRules,
+                [...validationRules, () => OperationPathsVisitor(rulesContext)],
                 options,
                 rulesContext.getTypeInfo(),
               )
