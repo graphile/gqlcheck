@@ -1,6 +1,9 @@
 query FoFoFoFoFoF {
   currentUser {
     ...F1
+    # This path shouldn't show up in the error
+    # FoFoFoFoFoF:query>currentUser>F6:User.friends>name
+    ...F6
   }
 }
 fragment F1 on User {
