@@ -114,31 +114,55 @@ async function main() {
       config,
       onError,
     );
-    const baseValidationRules = [...specifiedRules];
+    const validationRules = [...specifiedRules];
     const mode =
       graphqlVersionMajor === 15 ? 1 : graphqlVersionMajor === 16 ? 2 : 0;
     if (mode > 0) {
       // We need to run this so we know what the operation path/operation names are for rule errors.
-      baseValidationRules.push(() => OperationPathsVisitor(rulesContext));
+      validationRules.push(() => OperationPathsVisitor(rulesContext));
     }
 
-    const validationErrors =
-      mode === 1
-        ? // GraphQL v15 style
-          validate(
-            schema,
-            document,
-            baseValidationRules,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            typeInfo as any,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            {} as any,
-          )
-        : mode === 2
-          ? // GraphQL v16 style
-            validate(schema, document, baseValidationRules, {}, typeInfo)
-          : // GraphQL v17 MIGHT remove typeInfo
-            validate(schema, document, baseValidationRules);
+    const validationErrors = await middleware.run(
+      "validate",
+      {
+        validate,
+        schema,
+        document,
+        rulesContext,
+        validationRules,
+        options: {},
+      },
+      ({
+        validate,
+        schema,
+        document,
+        rulesContext,
+        validationRules,
+        options,
+      }) =>
+        mode === 1
+          ? // GraphQL v15 style
+            validate(
+              schema,
+              document,
+              validationRules,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              typeInfo as any,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              options as any,
+            )
+          : mode === 2
+            ? // GraphQL v16 style
+              validate(
+                schema,
+                document,
+                validationRules,
+                options,
+                rulesContext.getTypeInfo(),
+              )
+            : // GraphQL v17 MIGHT remove typeInfo
+              validate(schema, document, validationRules),
+    );
 
     if (validationErrors.length > 0) {
       return {

@@ -1,4 +1,11 @@
-import type { ASTVisitor, GraphQLFormattedError } from "graphql";
+import type {
+  ASTVisitor,
+  DocumentNode,
+  GraphQLFormattedError,
+  GraphQLSchema,
+  validate,
+  ValidationRule,
+} from "graphql";
 
 import type { RulesContext } from "./rulesContext";
 
@@ -78,4 +85,14 @@ export interface CreateVisitorEvent {
 export interface ErrorOperationLocation {
   operationName: string | undefined;
   operationCoordinates: string[];
+}
+export interface ValidateEvent {
+  validate: typeof validate;
+  schema: GraphQLSchema;
+  document: DocumentNode;
+  rulesContext: RulesContext;
+  validationRules: ValidationRule[];
+  options: {
+    maxErrors?: number;
+  };
 }

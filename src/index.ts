@@ -1,10 +1,11 @@
 import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
-import type { ASTVisitor } from "graphql";
+import type { ASTVisitor, GraphQLError } from "graphql";
 
 import type {
   CheckDocumentEvent,
   CheckDocumentOutput,
   CreateVisitorEvent,
+  ValidateEvent,
   VisitorsEvent,
 } from "./interfaces.js";
 
@@ -61,6 +62,9 @@ declare global {
     }
 
     interface GqlcheckMiddleware {
+      validate(
+        event: ValidateEvent,
+      ): PromiseOrDirect<ReadonlyArray<GraphQLError>>;
       checkDocument(
         event: CheckDocumentEvent,
       ): PromiseLike<CheckDocumentOutput>;
@@ -69,6 +73,5 @@ declare global {
     }
   }
 }
-
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
 export type TruePromiseOrDirect<T> = Promise<T> | T;
