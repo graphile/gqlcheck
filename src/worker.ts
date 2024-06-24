@@ -129,7 +129,9 @@ async function main() {
             schema,
             document,
             baseValidationRules,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             typeInfo as any,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             {} as any,
           )
         : mode === 2
