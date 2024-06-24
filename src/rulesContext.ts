@@ -7,6 +7,7 @@ import type {
   GraphQLSchema,
   OperationDefinitionNode,
 } from "graphql";
+import * as graphqlLibrary from "graphql";
 import { Kind, ValidationContext } from "graphql";
 
 import type { ErrorOperationLocation } from "./interfaces";
@@ -14,6 +15,7 @@ import type { TypeAndOperationPathInfo } from "./operationPaths";
 import type { RuleError } from "./ruleError";
 
 export class RulesContext extends ValidationContext {
+  graphqlLibrary = graphqlLibrary;
   constructor(
     schema: GraphQLSchema,
     ast: DocumentNode,
