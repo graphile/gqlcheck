@@ -15,20 +15,21 @@ import {
   Kind,
 } from "graphql";
 
+import { ErrorOperationLocation } from "./interfaces.js";
 import { RuleError } from "./ruleError.js";
 import type { RulesContext } from "./rulesContext.js";
 
 interface DepthInfo {
   current: number;
   max: number;
-  nodesByDepth: Map<number, ASTNode[]>;
+  detailsByDepth: Map<number, { nodes: ASTNode[]; operationCoords: string[] }>;
 }
 
 function newDepthInfo(): DepthInfo {
   return {
     current: 0,
     max: 0,
-    nodesByDepth: new Map(),
+    detailsByDepth: new Map(),
   };
 }
 
@@ -127,7 +128,7 @@ function resolveFragment(
   try {
     // Step 1: add all the fragments own depths
     for (const key of Object.keys(fragmentRoot.depths) as (keyof Depths)[]) {
-      const { max: fragMax, nodesByDepth: fragNodesByDepth } =
+      const { max: fragMax, detailsByDepth: fragDetailsByDepth } =
         fragmentRoot.depths[key]!;
       if (!depths[key]) {
         depths[key] = newDepthInfo();
@@ -136,15 +137,20 @@ function resolveFragment(
       if (adjustedMax > depths[key].max) {
         depths[key].max = adjustedMax;
       }
-      for (const [fragDepth, fragNodes] of fragNodesByDepth) {
-        //const transformedCoords = fragNodes.map((c) => `${operationPath}${c}`);
+      for (const [fragDepth, fragDetails] of fragDetailsByDepth) {
+        const transformedCoords = fragDetails.operationCoords.map(
+          (c) => `${operationPath}${c}`,
+        );
         const depth = depths[key].current + fragDepth;
-        const list = depths[key].nodesByDepth.get(depth);
-        if (list) {
-          // More performant than list.push(...transformedCoords)
-          fragNodes.forEach((c) => list.push(c));
+        const details = depths[key].detailsByDepth.get(depth);
+        if (details) {
+          // More performant than details.operationCoords.push(...transformedCoords)
+          transformedCoords.forEach((c) => details.operationCoords.push(c));
         } else {
-          depths[key].nodesByDepth.set(depth, [...fragNodes]);
+          depths[key].detailsByDepth.set(depth, {
+            operationCoords: transformedCoords,
+            nodes: [...fragDetails.nodes],
+          });
         }
       }
     }
@@ -212,7 +218,9 @@ function resolveOperationRoot(
       depths[key] = newDepthInfo();
     }
     depths[key].max = operationRoot.depths[key]!.max;
-    depths[key].nodesByDepth = new Map(operationRoot.depths[key]!.nodesByDepth);
+    depths[key].detailsByDepth = new Map(
+      operationRoot.depths[key]!.detailsByDepth,
+    );
   }
   traverseFragmentReferences(
     fragmentRootByName,
@@ -264,9 +272,14 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
     const { current, max } = currentRoot.depths[key];
     if (current > max) {
       currentRoot.depths[key].max = current;
-      currentRoot.depths[key].nodesByDepth.set(current, [node]);
+      currentRoot.depths[key].detailsByDepth.set(current, {
+        operationCoords: [context.getOperationPath()],
+        nodes: [node],
+      });
     } else if (current === max) {
-      currentRoot.depths[key].nodesByDepth.get(current)!.push(node);
+      const details = currentRoot.depths[key].detailsByDepth.get(current)!;
+      details.operationCoords.push(context.getOperationPath());
+      details.nodes.push(node);
     }
   }
 
@@ -341,7 +354,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
 
           // Now see if we've exceeded the limits
           for (const key of Object.keys(resolvedOperation.depths)) {
-            const { max, nodesByDepth } = resolvedOperation.depths[key]!;
+            const { max, detailsByDepth } = resolvedOperation.depths[key]!;
             const selfReferential = key.includes(".");
             const [limit, override, infraction, label] = ((): [
               limit: number,
@@ -402,14 +415,22 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
             })();
             if (max > limit) {
               const nodes: ASTNode[] = [];
+              const operationCoordinates: string[] = [];
               for (let i = limit + 1; i <= max; i++) {
-                nodesByDepth.get(i)?.forEach((c) => nodes.push(c));
+                const details = detailsByDepth.get(i)!;
+                details.nodes.forEach((c) => nodes.push(c));
+                details.operationCoords.forEach((c) =>
+                  operationCoordinates.push(c),
+                );
               }
               const error = new RuleError(
                 `${label} exceeded: ${max} > ${limit}`,
                 {
                   infraction,
                   nodes,
+                  errorOperationLocations: [
+                    { operationName, operationCoordinates },
+                  ],
                   override,
                 },
               );
