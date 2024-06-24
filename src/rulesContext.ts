@@ -147,8 +147,14 @@ export class RulesContext extends ValidationContext {
       }
     }
   }
+  getOperationNamesForNodes(nodes: readonly ASTNode[] | undefined) {
+    return nodes
+      ? nodes.flatMap((node) => this.operationNamesByNode.get(node) ?? [])
+      : [];
+  }
   getErrorOperationLocationsForNodes(
     nodes: readonly ASTNode[] | undefined,
+    limitToOperations?: ReadonlyArray<string | undefined>,
   ): ReadonlyArray<ErrorOperationLocation> {
     if (nodes == null) {
       return [];
@@ -158,6 +164,9 @@ export class RulesContext extends ValidationContext {
       const nodeOperationNames = this.operationNamesByNode.get(node);
       if (nodeOperationNames) {
         for (const operationName of nodeOperationNames) {
+          if (limitToOperations && !limitToOperations.includes(operationName)) {
+            continue;
+          }
           let set = map.get(operationName);
           if (!set) {
             set = new Set();
