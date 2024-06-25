@@ -9,7 +9,7 @@ import { kjsonlLines } from "kjsonl";
 import { filterBaseline, generateBaseline } from "./baseline.js";
 import type { SourceLike } from "./interfaces.js";
 import { checkOperations } from "./main.js";
-import { printResults } from "./print.js";
+import { generateOutputAndCounts, printResults } from "./print.js";
 import { version } from "./version.js";
 
 const parseArgsConfig = {
@@ -169,7 +169,14 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
       result.rawResultsBySourceName,
     );
   }
-  console.log(printResults(result));
+  const { output, errors, infractions } = generateOutputAndCounts(result);
+  console.log(output);
+  if (errors > 0) {
+    process.exitCode = 1;
+  }
+  if (infractions > 0) {
+    process.exitCode = 2;
+  }
 }
 
 main().catch((e) => {

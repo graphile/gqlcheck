@@ -32,6 +32,17 @@ function printCounts(result: CheckOperationsResult) {
 }
 
 export function printResults(result: CheckOperationsResult, _detailed = false) {
+  return generateOutputAndCounts(result).output;
+}
+
+export function generateOutputAndCounts(
+  result: CheckOperationsResult,
+  _detailed = false,
+): {
+  output: string;
+  errors: number;
+  infractions: number;
+} {
   const results = result.resultsBySourceName;
   let errors = 0;
   let infractions = 0;
@@ -58,7 +69,8 @@ export function printResults(result: CheckOperationsResult, _detailed = false) {
       }
     })
     .filter(Boolean);
-  return `
+  return {
+    output: `
 ${parts.join("\n\n")}
 
 Visited:
@@ -66,5 +78,8 @@ ${printCounts(result)}
 
 Errors: ${errors}
 Infractions: ${infractions}
-`.trim();
+`.trim(),
+    errors,
+    infractions,
+  };
 }
