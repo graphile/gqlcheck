@@ -54,3 +54,8 @@ SelfOtherSelf5.graphql:
 - [13:23] Maximum selection depth limit exceeded: 11 > 10
   Problematic paths:
   - SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf
+
+Scanned 14 documents consisting of 14 operations (and 35 fragments). Visited 113 fields, 0 arguments, 36 named fragment spreads and 0 inline fragment spreads.
+
+Errors: 4
+Infractions: 9

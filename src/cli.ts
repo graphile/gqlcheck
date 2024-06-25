@@ -9,7 +9,7 @@ import { kjsonlLines } from "kjsonl";
 import { filterBaseline, generateBaseline } from "./baseline.js";
 import type { SourceLike } from "./interfaces.js";
 import { checkOperations } from "./main.js";
-import { printResults } from "./print.js";
+import { generateOutputAndCounts } from "./print.js";
 import { version } from "./version.js";
 
 const parseArgsConfig = {
@@ -150,7 +150,7 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
     ...(values.schema ? { schemaSdlPath: values.schema } : null),
     ...(values.baseline ? { baselinePath: values.baseline } : null),
   };
-  const result = await checkOperations(getOperations, values.config, conf);
+  let result = await checkOperations(getOperations, values.config, conf);
   if (values["update-baseline"]) {
     const baselinePath = result.resolvedPreset.gqlcheck?.baselinePath;
     if (!baselinePath) {
@@ -163,13 +163,18 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
       ? JSON5.stringify(newBaseline, null, 2)
       : JSON.stringify(newBaseline, null, 2);
     await writeFile(baselinePath, data + "\n");
-    result.baseline = newBaseline;
-    result.resultsBySourceName = filterBaseline(
-      newBaseline,
-      result.rawResultsBySourceName,
-    );
+    result = filterBaseline(newBaseline, result);
+    console.log(`New baseline written to ${baselinePath}`);
+    console.log();
   }
-  console.log(printResults(result));
+  const { output, errors, infractions } = generateOutputAndCounts(result);
+  console.log(output);
+  if (errors > 0) {
+    process.exitCode = 1;
+  }
+  if (infractions > 0) {
+    process.exitCode = 2;
+  }
 }
 
 main().catch((e) => {

@@ -10,7 +10,7 @@ import type {
 import * as graphqlLibrary from "graphql";
 import { Kind, ValidationContext } from "graphql";
 
-import type { ErrorOperationLocation } from "./interfaces";
+import type { CheckDocumentOutput, ErrorOperationLocation } from "./interfaces";
 import type { TypeAndOperationPathInfo } from "./operationPaths";
 import type { RuleError } from "./ruleError";
 
@@ -24,6 +24,16 @@ export class RulesContext extends ValidationContext {
     onError: (error: RuleError | GraphQLError) => void,
   ) {
     super(schema, ast, typeInfo, (error) => onError(error));
+  }
+  _meta: CheckDocumentOutput["meta"] = Object.create(null);
+  addMeta<TKey extends keyof CheckDocumentOutput["meta"]>(
+    key: TKey,
+    value: CheckDocumentOutput["meta"][TKey],
+  ): void {
+    this._meta[key] = value;
+  }
+  getMeta() {
+    return this._meta;
   }
   getTypeInfo() {
     return this.typeInfo;

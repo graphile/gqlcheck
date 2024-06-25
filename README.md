@@ -1,21 +1,118 @@
 # gqlcheck
 
-This tool is designed to perform checks against your GraphQL documents (which
-contain one or more query, mutation or subscription operations and any
-associated fragments) before you ship them to production, to help ensure the
-safety of your servers. You should use it alongside other tooling such as
+This tool is designed to perform checks (see [Rules](#rules)) against your
+GraphQL documents (which contain one or more query, mutation or subscription
+operations and any associated fragments) before you ship them to production, to
+help ensure the safety of your servers. You should use it alongside other
+tooling such as
 [trusted documents](https://benjie.dev/graphql/trusted-documents) and
 [GraphQL-ESLint](https://the-guild.dev/graphql/eslint/docs) to ensure you're
 shipping the best GraphQL you can.
 
-What sets this tool apart is that it allows you to capture (and allowlist) the
-current state of your existing operations, called the "baseline", whilst
-enforcing more rigorous rules against future operations (and against new fields
-added to existing operations). You can thus safely adopt this tool with strict
-rules enabled, even if you've been lenient with your GraphQL operations up until
-this point, without breaking existing operations.
+This tools is designed to be **safe to incorporate into your existing
+projects** - it enables you to capture (and allowlist) the current state of your
+existing operations, called the "baseline", whilst enforcing more rigorous rules
+against future operations (and against new fields added to existing operations).
+You can thus safely adopt this tool with strict rules enabled, even if you've
+been lenient with your GraphQL operations up until this point, without breaking
+existing operations. And you can change the configuration options at any point
+and simply reset the baseline to avoid having to adjust existing operations to
+match your new rules.
 
-## Works with any GraphQL system
+`gqlcheck` by default uses all cores available on your processor to complete the
+checks as fast as possible; to adjust this see [Configuration](#configuration).
+
+## TL;DR
+
+Run a check passing your schema and a path to your operations (either `.graphql`
+file(s), directory containing the same, or a
+[KJSONL file](https://github.com/benjie/kjsonl) containing operations):
+
+```bash
+npx gqlcheck -s path/to/schema.graphqls path/to/operations
+```
+
+Output:
+
+```
+path/to/operations/doc2.graphql:
+- [17:3] Self-reference limit for field 'User.friends' exceeded: 3 > 2
+  Problematic paths:
+  - FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends
+
+path/to/operations/doc3.graphql:
+- [7:13] Maximum list nesting depth limit exceeded: 6 > 4
+  Problematic paths:
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends
+- [5:9] Self-reference limit for field 'User.friends' exceeded: 6 > 2
+  Problematic paths:
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends
+  - FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends
+
+Scanned 3 documents consisting of 3 operations (and 3 fragments). Visited 16
+fields, 0 arguments, 3 named fragment spreads and 0 inline fragment spreads.
+
+Errors: 0
+Infractions: 3
+```
+
+This reveals all our documents are valid (no errors), but they don't comply with
+our rules (3 infractions). But these are existing operations; we only want to
+defend against newly introduced issues, all existing operations should be
+allowed. To achieve this, we create a baseline using the `-b` and `-u` flags:
+
+```bash
+npx gqlcheck -s path/to/schema.graphqls path/to/operations -b baseline.json5 -u
+```
+
+```
+New baseline written to baseline.json5
+
+Scanned 3 documents consisting of 3 operations (and 3 fragments). Visited 16
+fields, 0 arguments, 3 named fragment spreads and 0 inline fragment spreads.
+
+Errors: 0
+Infractions: 0 (baseline removed: 3)
+```
+
+Passing all these flags is a chore; instead, let's create a configuration file
+`graphile.config.mjs`:
+
+```ts
+export default {
+  gqlcheck: {
+    schemaSdlPath: "path/to/schema.graphqls",
+    baselinePath: "baseline.json5",
+  },
+};
+```
+
+Then in CI we can check no new issues are introduced:
+
+```bash
+npx gqlcheck path/to/operations
+```
+
+```
+Scanned 3 documents consisting of 3 operations (and 3 fragments). Visited 16
+fields, 0 arguments, 3 named fragment spreads and 0 inline fragment spreads.
+
+Errors: 0
+Infractions: 0 (baseline removed: 3)
+```
+
+## Exit status
+
+The `gqlcheck` command exits with a status code indicating success or failure:
+
+Exit status 0: no issues found.  
+Exit status 1: errors (including validation errors) found.  
+Exit status 2: infractions found.
+
+## Works with any GraphQL system (in any language)
 
 This tool takes the SDL describing your GraphQL schema and your GraphQL
 documents as inputs, and as output gives you a pass or a fail (with details). So
@@ -167,6 +264,24 @@ const preset = {
 };
 
 export default preset;
+```
+
+If you aren't using TypeScript and want a shorter config, you can omit all
+comments and export directly:
+
+```js
+export default {
+  gqlcheck: {
+    schemaSdlPath: "schema.graphqls",
+    baselinePath: "baseline.json5",
+    config: {
+      maxDepth: 12,
+      maxListDepth: 4,
+      maxSelfReferentialDepth: 2,
+      maxDepthByFieldCoordinates: {},
+    },
+  },
+};
 ```
 
 ### Per-operation overrides

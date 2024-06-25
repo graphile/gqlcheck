@@ -19,6 +19,7 @@ import {
   visitWithTypeInfo,
 } from "graphql";
 
+import { CountVisitor } from "./CountVisitor.js";
 import { DepthVisitor } from "./DepthVisitor.js";
 import type {
   CheckDocumentOperationResult,
@@ -87,13 +88,6 @@ async function main() {
     const operationDefinitions = document.definitions.filter(
       (o) => o.kind === Kind.OPERATION_DEFINITION,
     );
-    if (operationDefinitions.length === 0) {
-      return {
-        sourceName,
-        operations: [],
-        errors: [{ message: "Could not find any operations in this document" }],
-      };
-    }
 
     const typeInfo = new TypeAndOperationPathInfo(schema);
     const errors: (RuleFormattedError | GraphQLFormattedError)[] = [];
@@ -114,6 +108,17 @@ async function main() {
       config,
       onError,
     );
+
+    if (operationDefinitions.length === 0) {
+      return {
+        sourceName,
+        operations: [],
+        errors: [{ message: "Could not find any operations in this document" }],
+        meta: rulesContext.getMeta(),
+        filtered: 0,
+      };
+    }
+
     const validationRules = [...specifiedRules];
     const mode =
       graphqlVersionMajor === 15 ? 1 : graphqlVersionMajor === 16 ? 2 : 0;
@@ -170,6 +175,8 @@ async function main() {
             // Ignore deprecated, this is for GraphQL v15 support
             formatError(e),
         ),
+        meta: rulesContext.getMeta(),
+        filtered: 0,
       };
     }
 
@@ -186,7 +193,10 @@ async function main() {
 
     const visitors = await middleware.run(
       "visitors",
-      { rulesContext, visitors: [DepthVisitor(rulesContext)] },
+      {
+        rulesContext,
+        visitors: [CountVisitor(rulesContext), DepthVisitor(rulesContext)],
+      },
       ({ visitors }) => visitors,
     );
     const visitor = await middleware.run(
@@ -216,6 +226,8 @@ async function main() {
       sourceName,
       errors,
       operations,
+      meta: rulesContext.getMeta(),
+      filtered: 0,
     };
   }
 

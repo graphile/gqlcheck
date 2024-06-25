@@ -9,3 +9,8 @@ Invalid_FoFoFoFoF_tight_cycle.graphql:
 
 Invalid_FoFoFoFoF_wide_cycle.graphql:
 - [9:5] Cannot spread fragment "F1" within itself via "F2", "F3", "F4", "F5".
+
+Scanned 14 documents consisting of 14 operations (and 35 fragments). Visited 113 fields, 0 arguments, 36 named fragment spreads and 0 inline fragment spreads.
+
+Errors: 4
+Infractions: 0 (baseline removed: 9)
