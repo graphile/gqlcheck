@@ -9,7 +9,7 @@ import { kjsonlLines } from "kjsonl";
 import { filterBaseline, generateBaseline } from "./baseline.js";
 import type { SourceLike } from "./interfaces.js";
 import { checkOperations } from "./main.js";
-import { generateOutputAndCounts, printResults } from "./print.js";
+import { generateOutputAndCounts } from "./print.js";
 import { version } from "./version.js";
 
 const parseArgsConfig = {

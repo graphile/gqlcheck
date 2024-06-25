@@ -1,4 +1,4 @@
-import type { ASTNode, ASTVisitor } from "graphql";
+import type { ASTVisitor } from "graphql";
 import { Kind } from "graphql";
 
 import type { CheckDocumentCounts } from "./interfaces.js";
