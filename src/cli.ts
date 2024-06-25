@@ -151,6 +151,7 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
     ...(values.baseline ? { baselinePath: values.baseline } : null),
   };
   const result = await checkOperations(getOperations, values.config, conf);
+  let filtered = 0;
   if (values["update-baseline"]) {
     const baselinePath = result.resolvedPreset.gqlcheck?.baselinePath;
     if (!baselinePath) {
@@ -164,12 +165,18 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
       : JSON.stringify(newBaseline, null, 2);
     await writeFile(baselinePath, data + "\n");
     result.baseline = newBaseline;
-    result.resultsBySourceName = filterBaseline(
+    const filterResult = filterBaseline(
       newBaseline,
       result.rawResultsBySourceName,
     );
+    result.resultsBySourceName = filterResult.resultsBySourceName;
+    filtered = filterResult.filtered;
+    console.log(`New baseline written to ${baselinePath}`);
+    console.log();
   }
-  const { output, errors, infractions } = generateOutputAndCounts(result);
+  const { output, errors, infractions } = generateOutputAndCounts(result, {
+    filtered,
+  });
   console.log(output);
   if (errors > 0) {
     process.exitCode = 1;

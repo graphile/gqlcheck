@@ -43,20 +43,26 @@ function printCounts(result: CheckOperationsResult) {
     .join("\n");
     */
 }
-
-export function printResults(result: CheckOperationsResult, _detailed = false) {
-  return generateOutputAndCounts(result).output;
+interface PrintResultsOptions {
+  filtered?: number;
+}
+export function printResults(
+  result: CheckOperationsResult,
+  options: PrintResultsOptions = Object.create(null),
+) {
+  return generateOutputAndCounts(result, options).output;
 }
 
 export function generateOutputAndCounts(
   result: CheckOperationsResult,
-  _detailed = false,
+  options: PrintResultsOptions = Object.create(null),
 ): {
   output: string;
   errors: number;
   infractions: number;
 } {
   const results = result.resultsBySourceName;
+  const { filtered = 0 } = options;
   let errors = 0;
   let infractions = 0;
   const parts = Object.entries(results)
@@ -89,7 +95,7 @@ ${parts.join("\n\n")}
 ${printCounts(result)}
 
 Errors: ${errors}
-Infractions: ${infractions}
+Infractions: ${infractions}${filtered > 0 ? ` (baseline removed: ${filtered})` : ``}
 `.trim(),
     errors,
     infractions,

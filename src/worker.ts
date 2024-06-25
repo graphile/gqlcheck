@@ -115,6 +115,7 @@ async function main() {
         operations: [],
         errors: [{ message: "Could not find any operations in this document" }],
         meta: rulesContext.getMeta(),
+        filtered: 0,
       };
     }
 
@@ -175,6 +176,7 @@ async function main() {
             formatError(e),
         ),
         meta: rulesContext.getMeta(),
+        filtered: 0,
       };
     }
 
@@ -225,6 +227,7 @@ async function main() {
       errors,
       operations,
       meta: rulesContext.getMeta(),
+      filtered: 0,
     };
   }
 

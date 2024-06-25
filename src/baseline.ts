@@ -46,6 +46,7 @@ function filterOutput(
   output: CheckDocumentOutput,
 ): CheckDocumentOutput {
   const { errors: rawErrors } = output;
+  let filtered = 0;
 
   const errors = rawErrors
     .map((e) => {
@@ -72,6 +73,7 @@ function filterOutput(
             );
             if (operationCoordinates.length === 0) {
               // Fully ignored
+              filtered++;
               return null;
             }
             op.operationCoordinates = operationCoordinates;
@@ -93,21 +95,27 @@ function filterOutput(
   return {
     ...output,
     errors,
+    filtered,
   };
 }
 
 export function filterBaseline(
   baseline: Baseline,
   raw: SourceResultsBySourceName,
-): SourceResultsBySourceName {
+): {
+  filtered: number;
+  resultsBySourceName: SourceResultsBySourceName;
+} {
+  let filtered = 0;
   const entries = Object.entries(raw)
     .map(([sourceName, { output: rawOutput, sourceString }]) => {
       const output = filterOutput(baseline, rawOutput);
-      if (output === null) {
-        return null;
-      }
+      filtered += output.filtered;
       return [sourceName, { output, sourceString }];
     })
     .filter((e) => e != null);
-  return Object.fromEntries(entries);
+  return {
+    filtered,
+    resultsBySourceName: Object.fromEntries(entries),
+  };
 }

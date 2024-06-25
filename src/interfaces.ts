@@ -28,6 +28,7 @@ export interface CheckDocumentOutput {
   sourceName: string;
   errors: (GraphQLFormattedError | RuleFormattedError)[];
   operations: ReadonlyArray<CheckDocumentOperationResult>;
+  filtered: number;
   meta: {
     count?: CheckDocumentCounts;
   };
