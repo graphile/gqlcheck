@@ -82,20 +82,12 @@ Passing all these flags is a chore; instead, let's create a configuration file
 `graphile.config.mjs`:
 
 ```ts
-// @ts-check
-/** @import {} from 'gqlcheck' */
-
-const __dirname = new URL(".", import.meta.url).pathname;
-
-/** @type {GraphileConfig.Preset} */
-const preset = {
+export default {
   gqlcheck: {
-    schemaSdlPath: `${__dirname}/path/to/schema.graphqls`,
-    baselinePath: `${__dirname}/baseline.json5`,
+    schemaSdlPath: "path/to/schema.graphqls",
+    baselinePath: "baseline.json5",
   },
 };
-
-export default preset;
 ```
 
 Then in CI we can check no new issues are introduced:
