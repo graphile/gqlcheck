@@ -9,6 +9,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 4,
+          SelectionSet: 3,
+          Field: 3,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoF_fragments.graphql': {
@@ -21,6 +31,19 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 15,
+          SelectionSet: 8,
+          Field: 5,
+          FragmentSpread: 3,
+          FragmentDefinition: 3,
+          NamedType: 3,
+        },
+      },
+      filtered: 1,
     },
   },
   'FoFoF.graphql': {
@@ -57,6 +80,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 6,
+          SelectionSet: 5,
+          Field: 5,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoFoF_fragments.graphql': {
@@ -93,6 +126,19 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 19,
+          SelectionSet: 10,
+          Field: 6,
+          FragmentSpread: 4,
+          FragmentDefinition: 4,
+          NamedType: 4,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoFoF.graphql': {
@@ -129,6 +175,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 7,
+          SelectionSet: 6,
+          Field: 6,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoFoFoF_fragments.graphql': {
@@ -141,6 +197,19 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 23,
+          SelectionSet: 12,
+          Field: 7,
+          FragmentSpread: 5,
+          FragmentDefinition: 5,
+          NamedType: 5,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoFoFoF.graphql': {
@@ -153,6 +222,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 8,
+          SelectionSet: 7,
+          Field: 7,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoFoFoFoF_fragments.graphql': {
@@ -187,6 +266,19 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 28,
+          SelectionSet: 14,
+          Field: 8,
+          FragmentSpread: 7,
+          FragmentDefinition: 6,
+          NamedType: 6,
+        },
+      },
+      filtered: 0,
     },
   },
   'FoFoFoFoFoF.graphql': {
@@ -221,6 +313,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 9,
+          SelectionSet: 8,
+          Field: 8,
+        },
+      },
+      filtered: 0,
     },
   },
   'Invalid_FoFoFoFoF_nx_field.graphql': {
@@ -238,6 +340,8 @@
           ],
         },
       ],
+      meta: {},
+      filtered: 0,
     },
   },
   'Invalid_FoFoFoFoF_nx_frag.graphql': {
@@ -255,6 +359,8 @@
           ],
         },
       ],
+      meta: {},
+      filtered: 0,
     },
   },
   'Invalid_FoFoFoFoF_tight_cycle.graphql': {
@@ -272,6 +378,8 @@
           ],
         },
       ],
+      meta: {},
+      filtered: 0,
     },
   },
   'Invalid_FoFoFoFoF_wide_cycle.graphql': {
@@ -305,6 +413,8 @@
           ],
         },
       ],
+      meta: {},
+      filtered: 0,
     },
   },
   'Self10_fragments.graphql': {
@@ -339,6 +449,19 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 40,
+          SelectionSet: 21,
+          Field: 12,
+          FragmentSpread: 9,
+          FragmentDefinition: 9,
+          NamedType: 9,
+        },
+      },
+      filtered: 0,
     },
   },
   'Self10.graphql': {
@@ -373,6 +496,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 13,
+          SelectionSet: 12,
+          Field: 12,
+        },
+      },
+      filtered: 0,
     },
   },
   'Self9_fragments.graphql': {
@@ -385,6 +518,19 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 36,
+          SelectionSet: 19,
+          Field: 11,
+          FragmentSpread: 8,
+          FragmentDefinition: 8,
+          NamedType: 8,
+        },
+      },
+      filtered: 0,
     },
   },
   'Self9.graphql': {
@@ -397,6 +543,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 12,
+          SelectionSet: 11,
+          Field: 11,
+        },
+      },
+      filtered: 0,
     },
   },
   'SelfOtherSelf5.graphql': {
@@ -431,6 +587,16 @@
           operationKind: 'query',
         },
       ],
+      meta: {
+        count: {
+          Document: 1,
+          OperationDefinition: 1,
+          Name: 13,
+          SelectionSet: 12,
+          Field: 12,
+        },
+      },
+      filtered: 0,
     },
   },
 }
