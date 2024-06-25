@@ -60,11 +60,6 @@ export function generateOutputAndCounts(result: CheckOperationsResult): {
     .map(([sourceName, spec]) => {
       const { output } = spec;
       const items: string[] = [];
-      if (!output) {
-        console.dir(result);
-        console.dir(results);
-        console.log(sourceName, spec);
-      }
       if (output.errors) {
         for (const error of output.errors) {
           if ("infraction" in error) {
