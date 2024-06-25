@@ -66,6 +66,7 @@ export interface CheckOperationsResult {
   baseline: Baseline | null;
   resolvedPreset: GraphileConfig.ResolvedPreset;
   counts: CheckDocumentCounts;
+  filtered: number;
 }
 
 export interface Baseline {

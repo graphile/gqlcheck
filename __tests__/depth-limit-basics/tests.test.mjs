@@ -35,6 +35,6 @@ it("depth-limit basics with full baseline", async () => {
   result.resultsBySourceName = filterBaseline(
     baseline,
     result.resultsBySourceName,
-  );
+  ).resultsBySourceName;
   await checkResult(result, "full-baseline");
 });

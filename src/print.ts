@@ -43,26 +43,16 @@ function printCounts(result: CheckOperationsResult) {
     .join("\n");
     */
 }
-interface PrintResultsOptions {
-  filtered?: number;
-}
-export function printResults(
-  result: CheckOperationsResult,
-  options: PrintResultsOptions = Object.create(null),
-) {
-  return generateOutputAndCounts(result, options).output;
+export function printResults(result: CheckOperationsResult) {
+  return generateOutputAndCounts(result).output;
 }
 
-export function generateOutputAndCounts(
-  result: CheckOperationsResult,
-  options: PrintResultsOptions = Object.create(null),
-): {
+export function generateOutputAndCounts(result: CheckOperationsResult): {
   output: string;
   errors: number;
   infractions: number;
 } {
   const results = result.resultsBySourceName;
-  const { filtered = 0 } = options;
   let errors = 0;
   let infractions = 0;
   const parts = Object.entries(results)
@@ -70,6 +60,11 @@ export function generateOutputAndCounts(
     .map(([sourceName, spec]) => {
       const { output } = spec;
       const items: string[] = [];
+      if (!output) {
+        console.dir(result);
+        console.dir(results);
+        console.log(sourceName, spec);
+      }
       if (output.errors) {
         for (const error of output.errors) {
           if ("infraction" in error) {
@@ -95,7 +90,7 @@ ${parts.join("\n\n")}
 ${printCounts(result)}
 
 Errors: ${errors}
-Infractions: ${infractions}${filtered > 0 ? ` (baseline removed: ${filtered})` : ``}
+Infractions: ${infractions}${result.filtered > 0 ? ` (baseline removed: ${result.filtered})` : ``}
 `.trim(),
     errors,
     infractions,
