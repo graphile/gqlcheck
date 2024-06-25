@@ -25,10 +25,23 @@ function printRuleFormattedError(error: RuleFormattedError) {
 }
 
 function printCounts(result: CheckOperationsResult) {
+  return `Scanned ${result.counts.Document ?? 0} documents consisting of ${
+    result.counts.OperationDefinition ?? 0
+  } operations (and ${
+    result.counts.FragmentDefinition ?? 0
+  } fragments). Visited ${result.counts.Field ?? 0} fields, ${
+    result.counts.Argument ?? 0
+  } arguments, ${
+    result.counts.FragmentSpread ?? 0
+  } named fragment spreads and ${
+    result.counts.InlineFragment ?? 0
+  } inline fragment spreads.`;
+  /*
   return Object.entries(result.counts)
     .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
     .map(([k, v]) => `- ${k}: ${v}`)
     .join("\n");
+    */
 }
 
 export function printResults(result: CheckOperationsResult, _detailed = false) {
@@ -73,7 +86,6 @@ export function generateOutputAndCounts(
     output: `
 ${parts.join("\n\n")}
 
-Visited:
 ${printCounts(result)}
 
 Errors: ${errors}
