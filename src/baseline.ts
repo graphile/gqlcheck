@@ -1,6 +1,7 @@
 import type {
   Baseline,
   CheckDocumentOutput,
+  CheckOperationsResult,
   SourceResultsBySourceName,
 } from "./interfaces";
 
@@ -101,21 +102,21 @@ function filterOutput(
 
 export function filterBaseline(
   baseline: Baseline,
-  raw: SourceResultsBySourceName,
-): {
-  filtered: number;
-  resultsBySourceName: SourceResultsBySourceName;
-} {
+  result: CheckOperationsResult,
+): CheckOperationsResult {
   let filtered = 0;
-  const entries = Object.entries(raw)
+  const entries = Object.entries(result.rawResultsBySourceName)
     .map(([sourceName, { output: rawOutput, sourceString }]) => {
       const output = filterOutput(baseline, rawOutput);
       filtered += output.filtered;
       return [sourceName, { output, sourceString }];
     })
     .filter((e) => e != null);
+  const resultsBySourceName = Object.fromEntries(entries);
   return {
+    ...result,
+    baseline,
+    resultsBySourceName,
     filtered,
-    resultsBySourceName: Object.fromEntries(entries),
   };
 }

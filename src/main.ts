@@ -262,16 +262,16 @@ export async function checkOperations(
     }
   }
 
-  const filterResult = baseline ? filterBaseline(baseline, results) : null;
-  return {
-    // TODO: counters: documents, operations, fragments, fields, arguments
+  let result: CheckOperationsResult = {
     rawResultsBySourceName: results,
-    resultsBySourceName: filterResult
-      ? filterResult.resultsBySourceName
-      : results,
+    resultsBySourceName: results,
     baseline,
     resolvedPreset: config,
     counts,
-    filtered: filterResult?.filtered ?? 0,
+    filtered: 0,
   };
+  if (baseline) {
+    result = filterBaseline(baseline, result);
+  }
+  return result;
 }

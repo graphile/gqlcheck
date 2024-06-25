@@ -32,9 +32,6 @@ it("depth-limit basics with full baseline", async () => {
     await getDirHelpers(__dirname);
   const result = await checkOperations(getDocuments, configPath);
   const baseline = generateBaseline(result.rawResultsBySourceName);
-  result.resultsBySourceName = filterBaseline(
-    baseline,
-    result.resultsBySourceName,
-  ).resultsBySourceName;
-  await checkResult(result, "full-baseline");
+  const filteredResult = filterBaseline(baseline, result);
+  await checkResult(filteredResult, "full-baseline");
 });
