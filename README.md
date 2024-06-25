@@ -75,7 +75,7 @@ Scanned 3 documents consisting of 3 operations (and 3 fragments). Visited 16
 fields, 0 arguments, 3 named fragment spreads and 0 inline fragment spreads.
 
 Errors: 0
-Infractions: 0 (baseline removed: 3)
+Infractions: 0 (ignored: 3)
 ```
 
 Passing all these flags is a chore; instead, let's create a configuration file
@@ -101,7 +101,7 @@ Scanned 3 documents consisting of 3 operations (and 3 fragments). Visited 16
 fields, 0 arguments, 3 named fragment spreads and 0 inline fragment spreads.
 
 Errors: 0
-Infractions: 0 (baseline removed: 3)
+Infractions: 0 (ignored: 3)
 ```
 
 ## Exit status
@@ -337,6 +337,56 @@ schema SDL is.
 
 You can also pass `-b baseline.json5` to identify your baseline file; and use
 `-u` to update the baseline such that all current documents are allowed.
+
+### Full usage
+
+```
+Usage:
+
+  gqlcheck [-s schema.graphqls] [-b baseline.json5] [-u] [-l] [-e] doc1.graphql doc2.graphql
+
+Flags:
+
+--help
+-h
+
+    Output available CLI flags
+
+--version
+-v
+
+    Output the version
+
+--config <configPath>
+-C <configPath>
+
+    The path to the config file
+
+--schema <sdlPath>
+-s <sdlPath>
+
+    Path to the GraphQL schema SDL file
+
+--baseline <jsonPath>
+-b <jsonPath>
+
+    Path to the baseline file (.json or .json5)
+
+--update-baseline
+-u
+
+    Update the baseline.json file to allow all passed documents even if they break the rules.
+
+--list
+-l
+
+    Don't output any details, just list the affected source names.
+
+--only-errors
+-e
+
+    Only output details about errors (not infractions); combine with `-l` to list only the files with errors.
+```
 
 ## FAQ
 

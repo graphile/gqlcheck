@@ -53,4 +53,4 @@ SelfOtherSelf5.graphql:
 Scanned 14 documents consisting of 14 operations (and 35 fragments). Visited 113 fields, 0 arguments, 36 named fragment spreads and 0 inline fragment spreads.
 
 Errors: 4
-Infractions: 8 (baseline removed: 1)
+Infractions: 8 (ignored: 1)

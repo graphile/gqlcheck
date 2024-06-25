@@ -9,7 +9,11 @@ import type {
   VisitorsEvent,
 } from "./interfaces.js";
 
-export { filterBaseline, generateBaseline } from "./baseline.js";
+export {
+  filterBaseline,
+  filterOnlyErrors,
+  generateBaseline,
+} from "./baseline.js";
 export {
   Baseline,
   CheckOperationsResult,

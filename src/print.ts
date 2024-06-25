@@ -85,7 +85,7 @@ ${parts.join("\n\n")}
 ${printCounts(result)}
 
 Errors: ${errors}
-Infractions: ${infractions}${result.filtered > 0 ? ` (baseline removed: ${result.filtered})` : ``}
+Infractions: ${infractions}${result.filtered > 0 ? ` (ignored: ${result.filtered})` : ``}
 `.trim(),
     errors,
     infractions,

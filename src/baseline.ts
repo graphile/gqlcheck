@@ -74,7 +74,6 @@ function filterOutput(
             );
             if (operationCoordinates.length === 0) {
               // Fully ignored
-              filtered++;
               return null;
             }
             op.operationCoordinates = operationCoordinates;
@@ -82,11 +81,36 @@ function filterOutput(
           })
           .filter((o) => o != null);
         if (operations.length === 0) {
+          filtered++;
           return null;
         } else {
           e.operations = operations;
           return e;
         }
+      } else {
+        return e;
+      }
+    })
+    .filter((e) => e != null);
+
+  return {
+    ...output,
+    errors,
+    filtered,
+  };
+}
+
+function filterOutputOnlyErrors(
+  output: CheckDocumentOutput,
+): CheckDocumentOutput {
+  const { errors: rawErrors } = output;
+  let filtered = 0;
+
+  const errors = rawErrors
+    .map((e) => {
+      if ("infraction" in e) {
+        filtered++;
+        return null;
       } else {
         return e;
       }
@@ -116,6 +140,25 @@ export function filterBaseline(
   return {
     ...result,
     baseline,
+    resultsBySourceName,
+    filtered,
+  };
+}
+
+export function filterOnlyErrors(
+  result: CheckOperationsResult,
+): CheckOperationsResult {
+  let filtered = 0;
+  const entries = Object.entries(result.rawResultsBySourceName)
+    .map(([sourceName, { output: rawOutput, sourceString }]) => {
+      const output = filterOutputOnlyErrors(rawOutput);
+      filtered += output.filtered;
+      return [sourceName, { output, sourceString }];
+    })
+    .filter((e) => e != null);
+  const resultsBySourceName = Object.fromEntries(entries);
+  return {
+    ...result,
     resultsBySourceName,
     filtered,
   };
