@@ -6,7 +6,11 @@ import { parseArgs } from "node:util";
 import JSON5 from "json5";
 import { kjsonlLines } from "kjsonl";
 
-import { filterBaseline, generateBaseline } from "./baseline.js";
+import {
+  filterBaseline,
+  filterOnlyErrors,
+  generateBaseline,
+} from "./baseline.js";
 import type { SourceLike } from "./interfaces.js";
 import { checkOperations } from "./main.js";
 import { generateOutputAndCounts } from "./print.js";
@@ -50,6 +54,20 @@ const parseArgsConfig = {
       short: "u",
       description:
         "Update the baseline.json file to allow all passed documents even if they break the rules.",
+    },
+    list: {
+      short: "l",
+      type: "boolean",
+      placeholder: undefined,
+      description:
+        "Don't output any details, just list the affected source names.",
+    },
+    "only-errors": {
+      short: "e",
+      type: "boolean",
+      placeholder: undefined,
+      description:
+        "Only output details about errors (not infractions); combine with `-l` to list only the files with errors.",
     },
   },
   allowPositionals: true,
@@ -133,7 +151,7 @@ async function main() {
       `
 Usage:
 
-  gqlcheck [-s schema.graphqls] [-b baseline.json5] [-u] doc1.graphql doc2.graphql
+  gqlcheck [-s schema.graphqls] [-b baseline.json5] [-u] [-l] [-e] doc1.graphql doc2.graphql
 
 Flags:
 
@@ -151,7 +169,14 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
     ...(values.baseline ? { baselinePath: values.baseline } : null),
   };
   let result = await checkOperations(getOperations, values.config, conf);
-  if (values["update-baseline"]) {
+  if (values["only-errors"]) {
+    if (values["update-baseline"]) {
+      throw new Error(
+        `--update-baseline cannot be combined with --only-errors`,
+      );
+    }
+    result = filterOnlyErrors(result);
+  } else if (values["update-baseline"]) {
     const baselinePath = result.resolvedPreset.gqlcheck?.baselinePath;
     if (!baselinePath) {
       throw new Error(
@@ -168,7 +193,17 @@ ${(Object.entries(parseArgsConfig.options) as Array<[key: keyof (typeof parseArg
     console.log();
   }
   const { output, errors, infractions } = generateOutputAndCounts(result);
-  console.log(output);
+  if (values["list"]) {
+    for (const [sourceName, { output }] of Object.entries(
+      result.resultsBySourceName,
+    )) {
+      if (output.errors.length > 0) {
+        console.log(sourceName);
+      }
+    }
+  } else {
+    console.log(output);
+  }
   if (errors > 0) {
     process.exitCode = 1;
   }

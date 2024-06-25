@@ -13,4 +13,4 @@ Invalid_FoFoFoFoF_wide_cycle.graphql:
 Scanned 14 documents consisting of 14 operations (and 35 fragments). Visited 113 fields, 0 arguments, 36 named fragment spreads and 0 inline fragment spreads.
 
 Errors: 4
-Infractions: 0 (baseline removed: 9)
+Infractions: 0 (ignored: 9)
