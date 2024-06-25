@@ -9,6 +9,7 @@ import JSON5 from "json5";
 import { filterBaseline } from "./baseline.js";
 import type {
   Baseline,
+  CheckDocumentCounts,
   CheckDocumentOutput,
   CheckDocumentRequest,
   CheckOperationsResult,
@@ -220,8 +221,12 @@ export async function checkOperations(
     allResults.push({ request, result });
   }
 
+  releaseWorkers();
+
   const results: SourceResultsBySourceName = Object.create(null);
   const operationKindByOperationName = new Map<string, string>();
+  const counts: Exclude<CheckDocumentOutput["meta"]["count"], undefined> =
+    Object.create(null);
   for (const { request, result } of allResults) {
     const { sourceName, sourceString } = request;
     const { operations } = result;
@@ -244,9 +249,18 @@ export async function checkOperations(
       sourceString,
       output: result,
     };
+    if (result.meta.count) {
+      for (const [key, value] of Object.entries(
+        result.meta.count,
+      ) as ReadonlyArray<[keyof CheckDocumentCounts, number]>) {
+        if (counts[key] === undefined) {
+          counts[key] = value;
+        } else {
+          counts[key] += value;
+        }
+      }
+    }
   }
-
-  releaseWorkers();
 
   return {
     // TODO: counters: documents, operations, fragments, fields, arguments
@@ -254,5 +268,6 @@ export async function checkOperations(
     resultsBySourceName: baseline ? filterBaseline(baseline, results) : results,
     baseline,
     resolvedPreset: config,
+    counts,
   };
 }

@@ -24,8 +24,17 @@ function printRuleFormattedError(error: RuleFormattedError) {
   return `${printGraphQLFormattedErrorLocations(error)}${error.message}\nProblematic paths:\n- ${opCoords.slice(0, 10).join("\n- ")}${opCoords.length > 10 ? "\n- ..." : ""}`;
 }
 
+function printCounts(result: CheckOperationsResult) {
+  return Object.entries(result.counts)
+    .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
+    .map(([k, v]) => `- ${k}: ${v}`)
+    .join("\n");
+}
+
 export function printResults(result: CheckOperationsResult, _detailed = false) {
   const results = result.resultsBySourceName;
+  let errors = 0;
+  let infractions = 0;
   const parts = Object.entries(results)
     .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
     .map(([sourceName, spec]) => {
@@ -34,8 +43,10 @@ export function printResults(result: CheckOperationsResult, _detailed = false) {
       if (output.errors) {
         for (const error of output.errors) {
           if ("infraction" in error) {
+            infractions++;
             items.push(printRuleFormattedError(error));
           } else {
+            errors++;
             items.push(printGraphQLFormattedError(error));
           }
         }
@@ -47,5 +58,13 @@ export function printResults(result: CheckOperationsResult, _detailed = false) {
       }
     })
     .filter(Boolean);
-  return parts.join("\n\n");
+  return `
+${parts.join("\n\n")}
+
+Visited:
+${printCounts(result)}
+
+Errors: ${errors}
+Infractions: ${infractions}
+`.trim();
 }

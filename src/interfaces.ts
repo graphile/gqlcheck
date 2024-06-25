@@ -1,4 +1,5 @@
 import type {
+  ASTNode,
   ASTVisitor,
   DocumentNode,
   GraphQLFormattedError,
@@ -19,10 +20,17 @@ export interface CheckDocumentRequest {
   sourceString: string;
 }
 
+export type CheckDocumentCounts = {
+  [key in ASTNode["kind"]]?: number;
+};
+
 export interface CheckDocumentOutput {
   sourceName: string;
   errors: (GraphQLFormattedError | RuleFormattedError)[];
   operations: ReadonlyArray<CheckDocumentOperationResult>;
+  meta: {
+    count?: CheckDocumentCounts;
+  };
 }
 
 export interface CheckDocumentOperationResult {
@@ -56,6 +64,7 @@ export interface CheckOperationsResult {
   resultsBySourceName: SourceResultsBySourceName;
   baseline: Baseline | null;
   resolvedPreset: GraphileConfig.ResolvedPreset;
+  counts: CheckDocumentCounts;
 }
 
 export interface Baseline {
