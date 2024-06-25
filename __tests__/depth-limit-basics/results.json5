@@ -17,10 +17,20 @@
       errors: [
         {
           message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
+          locations: [
+            {
+              line: 17,
+              column: 3,
+            },
+          ],
           infraction: "maxDepthByFieldCoordinates['User.friends']",
-          operationName: 'FoFoF',
-          operationCoordinates: [
-            'FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends',
+          operations: [
+            {
+              operationName: 'FoFoF',
+              operationCoordinates: [
+                'FoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends',
+              ],
+            },
           ],
           override: {
             maxDepthByFieldCoordinates: {
@@ -43,10 +53,20 @@
       errors: [
         {
           message: "Self-reference limit for field 'User.friends' exceeded: 3 > 2",
+          locations: [
+            {
+              line: 6,
+              column: 9,
+            },
+          ],
           infraction: "maxDepthByFieldCoordinates['User.friends']",
-          operationName: 'FoFoF',
-          operationCoordinates: [
-            'FoFoF:query>currentUser>friends>friends>friends',
+          operations: [
+            {
+              operationName: 'FoFoF',
+              operationCoordinates: [
+                'FoFoF:query>currentUser>friends>friends>friends',
+              ],
+            },
           ],
           override: {
             maxDepthByFieldCoordinates: {
@@ -69,10 +89,20 @@
       errors: [
         {
           message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
+          locations: [
+            {
+              line: 22,
+              column: 3,
+            },
+          ],
           infraction: "maxDepthByFieldCoordinates['User.friends']",
-          operationName: 'FoFoFoF',
-          operationCoordinates: [
-            'FoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends',
+          operations: [
+            {
+              operationName: 'FoFoFoF',
+              operationCoordinates: [
+                'FoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends',
+              ],
+            },
           ],
           override: {
             maxDepthByFieldCoordinates: {
@@ -95,10 +125,20 @@
       errors: [
         {
           message: "Self-reference limit for field 'User.friends' exceeded: 4 > 3",
+          locations: [
+            {
+              line: 7,
+              column: 11,
+            },
+          ],
           infraction: "maxDepthByFieldCoordinates['User.friends']",
-          operationName: 'FoFoFoF',
-          operationCoordinates: [
-            'FoFoFoF:query>currentUser>friends>friends>friends>friends',
+          operations: [
+            {
+              operationName: 'FoFoFoF',
+              operationCoordinates: [
+                'FoFoFoF:query>currentUser>friends>friends>friends>friends',
+              ],
+            },
           ],
           override: {
             maxDepthByFieldCoordinates: {
@@ -145,10 +185,20 @@
       errors: [
         {
           message: 'Maximum list nesting depth limit exceeded: 6 > 5',
+          locations: [
+            {
+              line: 35,
+              column: 3,
+            },
+          ],
           infraction: 'maxListDepth',
-          operationName: 'FoFoFoFoFoF',
-          operationCoordinates: [
-            'FoFoFoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends>F5:User.friends>F6:User.friends',
+          operations: [
+            {
+              operationName: 'FoFoFoFoFoF',
+              operationCoordinates: [
+                'FoFoFoFoFoF:query>currentUser>F1:User.friends>F2:User.friends>F3:User.friends>F4:User.friends>F5:User.friends>F6:User.friends',
+              ],
+            },
           ],
           override: {
             maxListDepth: 6,
@@ -169,10 +219,20 @@
       errors: [
         {
           message: 'Maximum list nesting depth limit exceeded: 6 > 5',
+          locations: [
+            {
+              line: 9,
+              column: 15,
+            },
+          ],
           infraction: 'maxListDepth',
-          operationName: 'FoFoFoFoFoF',
-          operationCoordinates: [
-            'FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends',
+          operations: [
+            {
+              operationName: 'FoFoFoFoFoF',
+              operationCoordinates: [
+                'FoFoFoFoFoF:query>currentUser>friends>friends>friends>friends>friends>friends',
+              ],
+            },
           ],
           override: {
             maxListDepth: 6,
@@ -277,10 +337,20 @@
       errors: [
         {
           message: 'Maximum selection depth limit exceeded: 11 > 10',
+          locations: [
+            {
+              line: 49,
+              column: 3,
+            },
+          ],
           infraction: 'maxDepth',
-          operationName: 'Self10',
-          operationCoordinates: [
-            'Self10:query>currentUser>self>F1:User.self>F2:User.self>F3:User.self>F4:User.self>F5:User.self>F6:User.self>F7:User.self>F8:User.self>F9:User.self',
+          operations: [
+            {
+              operationName: 'Self10',
+              operationCoordinates: [
+                'Self10:query>currentUser>self>F1:User.self>F2:User.self>F3:User.self>F4:User.self>F5:User.self>F6:User.self>F7:User.self>F8:User.self>F9:User.self',
+              ],
+            },
           ],
           override: {
             maxDepth: 11,
@@ -301,10 +371,20 @@
       errors: [
         {
           message: 'Maximum selection depth limit exceeded: 11 > 10',
+          locations: [
+            {
+              line: 13,
+              column: 23,
+            },
+          ],
           infraction: 'maxDepth',
-          operationName: 'Self10',
-          operationCoordinates: [
-            'Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self',
+          operations: [
+            {
+              operationName: 'Self10',
+              operationCoordinates: [
+                'Self10:query>currentUser>self>self>self>self>self>self>self>self>self>self',
+              ],
+            },
           ],
           override: {
             maxDepth: 11,
@@ -349,10 +429,20 @@
       errors: [
         {
           message: 'Maximum selection depth limit exceeded: 11 > 10',
+          locations: [
+            {
+              line: 13,
+              column: 23,
+            },
+          ],
           infraction: 'maxDepth',
-          operationName: 'SelfOtherSelf5',
-          operationCoordinates: [
-            'SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf',
+          operations: [
+            {
+              operationName: 'SelfOtherSelf5',
+              operationCoordinates: [
+                'SelfOtherSelf5:query>currentUser>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf>self>otherSelf',
+              ],
+            },
           ],
           override: {
             maxDepth: 11,

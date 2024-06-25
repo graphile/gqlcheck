@@ -1,4 +1,13 @@
-import type { GraphQLFormattedError } from "graphql";
+import type {
+  ASTVisitor,
+  DocumentNode,
+  GraphQLFormattedError,
+  GraphQLSchema,
+  validate,
+  ValidationRule,
+} from "graphql";
+
+import type { RulesContext } from "./rulesContext";
 
 export interface WorkerData {
   configPath: string | null | undefined;
@@ -35,8 +44,10 @@ export interface SourceResultsBySourceName {
 
 export interface RuleFormattedError extends GraphQLFormattedError {
   infraction: string;
-  operationName: string | undefined;
-  operationCoordinates: string[];
+  operations: ReadonlyArray<{
+    operationName: string | undefined;
+    operationCoordinates: ReadonlyArray<string>;
+  }>;
   override: GraphileConfig.GraphQLCheckConfig;
 }
 
@@ -57,5 +68,31 @@ export interface Baseline {
           };
         }
       | undefined;
+  };
+}
+
+export interface CheckDocumentEvent {
+  req: CheckDocumentRequest;
+}
+export interface VisitorsEvent {
+  rulesContext: RulesContext;
+  visitors: ASTVisitor[];
+}
+export interface CreateVisitorEvent {
+  rulesContext: RulesContext;
+  visitors: ASTVisitor[];
+}
+export interface ErrorOperationLocation {
+  operationName: string | undefined;
+  operationCoordinates: string[];
+}
+export interface ValidateEvent {
+  validate: typeof validate;
+  schema: GraphQLSchema;
+  document: DocumentNode;
+  rulesContext: RulesContext;
+  validationRules: ValidationRule[];
+  options: {
+    maxErrors?: number;
   };
 }

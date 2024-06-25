@@ -16,20 +16,23 @@ export function generateBaseline(
     for (const error of errors) {
       if ("infraction" in error) {
         // Rule error
-        const { operationName, infraction, operationCoordinates } = error;
-        if (!operationName) continue;
-        if (!baseline.operations[operationName]) {
-          baseline.operations[operationName] = {
-            ignoreCoordinatesByRule: Object.create(null),
-          };
-        }
-        const op = baseline.operations[operationName];
-        if (!op.ignoreCoordinatesByRule[infraction]) {
-          op.ignoreCoordinatesByRule[infraction] = [];
-        }
-        const ignores = op.ignoreCoordinatesByRule[infraction];
-        for (const coord of operationCoordinates) {
-          ignores.push(coord);
+        const { operations, infraction } = error;
+        if (!operations) continue;
+        for (const { operationName, operationCoordinates } of operations) {
+          if (!operationName) continue;
+          if (!baseline.operations[operationName]) {
+            baseline.operations[operationName] = {
+              ignoreCoordinatesByRule: Object.create(null),
+            };
+          }
+          const op = baseline.operations[operationName];
+          if (!op.ignoreCoordinatesByRule[infraction]) {
+            op.ignoreCoordinatesByRule[infraction] = [];
+          }
+          const ignores = op.ignoreCoordinatesByRule[infraction];
+          for (const coord of operationCoordinates) {
+            ignores.push(coord);
+          }
         }
       }
     }
@@ -47,35 +50,40 @@ function filterOutput(
   const errors = rawErrors
     .map((e) => {
       if ("infraction" in e) {
-        const {
-          infraction,
-          operationName,
-          operationCoordinates: rawCoords,
-        } = e;
-        if (!operationName) {
+        const { infraction, operations: rawOperations } = e;
+        if (!rawOperations) {
           return e;
         }
-        if (!baseline.operations[operationName]) {
-          return e;
-        }
-        const ignores =
-          baseline.operations[operationName].ignoreCoordinatesByRule[
-            infraction
-          ];
-        if (!ignores) {
-          return e;
-        }
-        const operationCoordinates = rawCoords.filter(
-          (c) => !ignores.includes(c),
-        );
-        if (operationCoordinates.length === 0) {
-          // Fully ignored
+        const operations = rawOperations
+          .map((op) => {
+            const { operationName, operationCoordinates: rawCoords } = op;
+            if (operationName == null) {
+              return op;
+            }
+            const ignores =
+              baseline.operations[operationName]?.ignoreCoordinatesByRule[
+                infraction
+              ] ?? [];
+            if (ignores.length === 0) {
+              return op;
+            }
+            const operationCoordinates = rawCoords.filter(
+              (c) => !ignores.includes(c),
+            );
+            if (operationCoordinates.length === 0) {
+              // Fully ignored
+              return null;
+            }
+            op.operationCoordinates = operationCoordinates;
+            return op;
+          })
+          .filter((o) => o != null);
+        if (operations.length === 0) {
           return null;
+        } else {
+          e.operations = operations;
+          return e;
         }
-        return {
-          ...e,
-          operationCoordinates,
-        };
       } else {
         return e;
       }

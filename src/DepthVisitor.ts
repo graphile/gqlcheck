@@ -1,6 +1,7 @@
 import * as assert from "node:assert";
 
 import type {
+  ASTNode,
   ASTVisitor,
   FragmentDefinitionNode,
   GraphQLOutputType,
@@ -20,14 +21,14 @@ import type { RulesContext } from "./rulesContext.js";
 interface DepthInfo {
   current: number;
   max: number;
-  coordsByDepth: Map<number, string[]>;
+  detailsByDepth: Map<number, { nodes: ASTNode[]; operationCoords: string[] }>;
 }
 
 function newDepthInfo(): DepthInfo {
   return {
     current: 0,
     max: 0,
-    coordsByDepth: new Map(),
+    detailsByDepth: new Map(),
   };
 }
 
@@ -126,7 +127,7 @@ function resolveFragment(
   try {
     // Step 1: add all the fragments own depths
     for (const key of Object.keys(fragmentRoot.depths) as (keyof Depths)[]) {
-      const { max: fragMax, coordsByDepth: fragCoordsByDepth } =
+      const { max: fragMax, detailsByDepth: fragDetailsByDepth } =
         fragmentRoot.depths[key]!;
       if (!depths[key]) {
         depths[key] = newDepthInfo();
@@ -135,15 +136,20 @@ function resolveFragment(
       if (adjustedMax > depths[key].max) {
         depths[key].max = adjustedMax;
       }
-      for (const [fragDepth, fragCoords] of fragCoordsByDepth) {
-        const transformedCoords = fragCoords.map((c) => `${operationPath}${c}`);
+      for (const [fragDepth, fragDetails] of fragDetailsByDepth) {
+        const transformedCoords = fragDetails.operationCoords.map(
+          (c) => `${operationPath}${c}`,
+        );
         const depth = depths[key].current + fragDepth;
-        const list = depths[key].coordsByDepth.get(depth);
-        if (list) {
-          // More performant than list.push(...transformedCoords)
-          transformedCoords.forEach((c) => list.push(c));
+        const details = depths[key].detailsByDepth.get(depth);
+        if (details) {
+          // More performant than details.operationCoords.push(...transformedCoords)
+          transformedCoords.forEach((c) => details.operationCoords.push(c));
         } else {
-          depths[key].coordsByDepth.set(depth, transformedCoords);
+          depths[key].detailsByDepth.set(depth, {
+            operationCoords: transformedCoords,
+            nodes: [...fragDetails.nodes],
+          });
         }
       }
     }
@@ -211,8 +217,8 @@ function resolveOperationRoot(
       depths[key] = newDepthInfo();
     }
     depths[key].max = operationRoot.depths[key]!.max;
-    depths[key].coordsByDepth = new Map(
-      operationRoot.depths[key]!.coordsByDepth,
+    depths[key].detailsByDepth = new Map(
+      operationRoot.depths[key]!.detailsByDepth,
     );
   }
   traverseFragmentReferences(
@@ -251,7 +257,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
   let state: State = newState();
   state.complete = true;
   let currentRoot: Root | null = null;
-  function incDepth<TKey extends keyof Depths>(key: TKey) {
+  function incDepth<TKey extends keyof Depths>(key: TKey, node: ASTNode) {
     if (!currentRoot) {
       throw new Error(
         `DepthVisitor attempted to increment depth, but there's no currentRoot!`,
@@ -265,13 +271,14 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
     const { current, max } = currentRoot.depths[key];
     if (current > max) {
       currentRoot.depths[key].max = current;
-      currentRoot.depths[key].coordsByDepth.set(current, [
-        context.getOperationPath(),
-      ]);
+      currentRoot.depths[key].detailsByDepth.set(current, {
+        operationCoords: [context.getOperationPath()],
+        nodes: [node],
+      });
     } else if (current === max) {
-      currentRoot.depths[key].coordsByDepth
-        .get(current)!
-        .push(context.getOperationPath());
+      const details = currentRoot.depths[key].detailsByDepth.get(current)!;
+      details.operationCoords.push(context.getOperationPath());
+      details.nodes.push(node);
     }
   }
 
@@ -346,7 +353,7 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
 
           // Now see if we've exceeded the limits
           for (const key of Object.keys(resolvedOperation.depths)) {
-            const { max, coordsByDepth } = resolvedOperation.depths[key]!;
+            const { max, detailsByDepth } = resolvedOperation.depths[key]!;
             const selfReferential = key.includes(".");
             const [limit, override, infraction, label] = ((): [
               limit: number,
@@ -406,18 +413,23 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
               }
             })();
             if (max > limit) {
+              const nodes: ASTNode[] = [];
               const operationCoordinates: string[] = [];
               for (let i = limit + 1; i <= max; i++) {
-                coordsByDepth
-                  .get(i)
-                  ?.forEach((c) => operationCoordinates.push(c));
+                const details = detailsByDepth.get(i)!;
+                details.nodes.forEach((c) => nodes.push(c));
+                details.operationCoords.forEach((c) =>
+                  operationCoordinates.push(c),
+                );
               }
               const error = new RuleError(
                 `${label} exceeded: ${max} > ${limit}`,
                 {
                   infraction,
-                  operationName,
-                  operationCoordinates,
+                  nodes,
+                  errorOperationLocations: [
+                    { operationName, operationCoordinates },
+                  ],
                   override,
                 },
               );
@@ -506,13 +518,15 @@ export function DepthVisitor(context: RulesContext): ASTVisitor {
         if (!parentType) return;
         const { namedType, listDepth } = processType(returnType);
         if (isCompositeType(namedType)) {
-          incDepth(`${parentType.name}.${node.name.value}`);
+          incDepth(`${parentType.name}.${node.name.value}`, node);
           incDepth(
             context.isIntrospection() ? "introspectionFields" : "fields",
+            node,
           );
           for (let i = 0; i < listDepth; i++) {
             incDepth(
               context.isIntrospection() ? "introspectionLists" : "lists",
+              node,
             );
           }
         }

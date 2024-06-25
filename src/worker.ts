@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { isMainThread, parentPort, workerData } from "node:worker_threads";
 
-import { resolvePresets } from "graphile-config";
+import { Middleware, orderedApply, resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
 import type { GraphQLError, GraphQLFormattedError } from "graphql";
 import {
@@ -10,8 +10,10 @@ import {
   Kind,
   parse,
   Source,
+  specifiedRules,
   validate,
   validateSchema,
+  version as graphqlVersion,
   visit,
   visitInParallel,
   visitWithTypeInfo,
@@ -26,8 +28,11 @@ import type {
   WorkerData,
 } from "./interfaces.js";
 import { TypeAndOperationPathInfo } from "./operationPaths.js";
+import { OperationPathsVisitor } from "./OperationPathsVisitor.js";
 import type { RuleError } from "./ruleError.js";
 import { RulesContext } from "./rulesContext.js";
+
+const graphqlVersionMajor = parseInt(graphqlVersion.split(".")[0], 10);
 
 if (isMainThread) {
   throw new Error(
@@ -52,6 +57,16 @@ async function main() {
   const {
     gqlcheck: { schemaSdlPath = `${process.cwd()}/schema.graphql` } = {},
   } = config;
+
+  const middleware = new Middleware<GraphileConfig.GqlcheckMiddleware>();
+  orderedApply(
+    config.plugins,
+    (p) => p.gqlcheck?.middleware,
+    (name, fn, _plugin) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      middleware.register(name, fn as any);
+    },
+  );
 
   const schemaString = readFileSync(schemaSdlPath, "utf8");
   const schema = buildASTSchema(parse(schemaString));
@@ -80,20 +95,17 @@ async function main() {
       };
     }
 
-    // TODO: regular validation
-    const validationErrors = validate(schema, document);
-    if (validationErrors.length > 0) {
-      return {
-        sourceName,
-        operations: [],
-        errors: validationErrors.map((e) => e.toJSON?.() ?? formatError(e)),
-      };
-    }
-
     const typeInfo = new TypeAndOperationPathInfo(schema);
     const errors: (RuleFormattedError | GraphQLFormattedError)[] = [];
-    function onError(error: RuleError | GraphQLError) {
-      errors.push(error.toJSON?.() ?? formatError(error));
+    function onError(
+      error: RuleError | (GraphQLError & { toJSONEnhanced?: undefined }),
+    ) {
+      errors.push(
+        error.toJSONEnhanced?.(rulesContext) ??
+          error.toJSON?.() ??
+          // Ignore deprecated, this is for GraphQL v15 support
+          formatError(error),
+      );
     }
     const rulesContext = new RulesContext(
       schema,
@@ -102,8 +114,91 @@ async function main() {
       config,
       onError,
     );
-    const visitor = visitInParallel([DepthVisitor(rulesContext)]);
-    visit(document, visitWithTypeInfo(typeInfo, visitor));
+    const validationRules = [...specifiedRules];
+    const mode =
+      graphqlVersionMajor === 15 ? 1 : graphqlVersionMajor === 16 ? 2 : 0;
+
+    const validationErrors = await middleware.run(
+      "validate",
+      {
+        validate,
+        schema,
+        document,
+        rulesContext,
+        validationRules,
+        options: {},
+      },
+      ({
+        validate,
+        schema,
+        document,
+        rulesContext,
+        validationRules,
+        options,
+      }) =>
+        mode === 1
+          ? // GraphQL v15 style
+            validate(
+              schema,
+              document,
+              [...validationRules, () => OperationPathsVisitor(rulesContext)],
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              typeInfo as any,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              options as any,
+            )
+          : mode === 2
+            ? // GraphQL v16 style
+              validate(
+                schema,
+                document,
+                [...validationRules, () => OperationPathsVisitor(rulesContext)],
+                options,
+                rulesContext.getTypeInfo(),
+              )
+            : // GraphQL v17 MIGHT remove typeInfo
+              validate(schema, document, validationRules),
+    );
+
+    if (validationErrors.length > 0) {
+      return {
+        sourceName,
+        operations: [],
+        errors: validationErrors.map(
+          (e) =>
+            e.toJSON?.() ??
+            // Ignore deprecated, this is for GraphQL v15 support
+            formatError(e),
+        ),
+      };
+    }
+
+    if (mode === 0) {
+      // Need to revisit, because OperationPathsVisitor didn't run above.
+      visit(
+        document,
+        visitWithTypeInfo(
+          rulesContext.getTypeInfo(),
+          visitInParallel([OperationPathsVisitor(rulesContext)]),
+        ),
+      );
+    }
+
+    const visitors = await middleware.run(
+      "visitors",
+      { rulesContext, visitors: [DepthVisitor(rulesContext)] },
+      ({ visitors }) => visitors,
+    );
+    const visitor = await middleware.run(
+      "createVisitor",
+      { rulesContext, visitors },
+      ({ rulesContext, visitors }) =>
+        visitWithTypeInfo(
+          rulesContext.getTypeInfo(),
+          visitInParallel(visitors),
+        ),
+    );
+    visit(document, visitor);
 
     const operations = operationDefinitions.map(
       (operationDefinition): CheckDocumentOperationResult => {
@@ -128,17 +223,18 @@ async function main() {
     if (req === "STOP") {
       process.exit(0);
     }
-    checkDocument(req).then(
-      (result) => {
-        definitelyParentPort.postMessage(result);
-      },
-      (e) => {
-        console.dir(e);
-        process.exit(1);
-      },
-    );
+    middleware
+      .run("checkDocument", { req }, ({ req }) => checkDocument(req))
+      .then(
+        (result) => {
+          definitelyParentPort.postMessage(result);
+        },
+        (e) => {
+          console.dir(e);
+          process.exit(1);
+        },
+      );
   });
-
   definitelyParentPort.postMessage("READY");
 }
 

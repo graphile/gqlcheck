@@ -1,13 +1,27 @@
 import * as assert from "node:assert";
 
-import type { ASTNode } from "graphql";
+import type {
+  ASTNode,
+  FragmentDefinitionNode,
+  OperationDefinitionNode,
+} from "graphql";
 import { Kind, TypeInfo } from "graphql";
 
 export class TypeAndOperationPathInfo extends TypeInfo {
   operationPathParts: string[] = [];
   _introspectionDepth = 0;
+  currentRoot: FragmentDefinitionNode | OperationDefinitionNode | null = null;
 
   enter(node: ASTNode) {
+    if (
+      node.kind === Kind.FRAGMENT_DEFINITION ||
+      node.kind === Kind.OPERATION_DEFINITION
+    ) {
+      if (this.currentRoot) {
+        throw new Error("There should be no root at this time");
+      }
+      this.currentRoot = node;
+    }
     this.enterOperationPath(node);
     if (
       node.kind === Kind.FRAGMENT_DEFINITION &&
@@ -32,7 +46,22 @@ export class TypeAndOperationPathInfo extends TypeInfo {
       this._introspectionDepth--;
     }
     this.leaveOperationPath(node);
+    if (
+      node.kind === Kind.FRAGMENT_DEFINITION ||
+      node.kind === Kind.OPERATION_DEFINITION
+    ) {
+      if (!this.currentRoot) {
+        throw new Error(
+          "There should have been a root when leaving a fragment/operation",
+        );
+      }
+      this.currentRoot = null;
+    }
     return result;
+  }
+
+  getCurrentRoot() {
+    return this.currentRoot;
   }
 
   enterOperationPath(node: ASTNode) {
@@ -159,7 +188,6 @@ export class TypeAndOperationPathInfo extends TypeInfo {
   getOperationPath() {
     return this.operationPathParts.join("");
   }
-
   isIntrospection() {
     return this._introspectionDepth > 0;
   }
