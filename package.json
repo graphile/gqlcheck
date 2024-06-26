@@ -1,6 +1,6 @@
 {
   "name": "gqlcheck",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Performs additional checks on your GraphQL documents and operations to ensure they conform to your rules, whilst allow-listing existing operations and their constituent parts (and allowing overrides on a per-field basis). Rules include max selection set depth, max list nesting, require pagination, limit self-referencing loops, etc. Add your own rules!",
   "main": "dist/index.js",
   "bin": {
