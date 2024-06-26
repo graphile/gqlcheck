@@ -124,10 +124,10 @@ specification.)
 ## Fast
 
 This tool uses a worker pool to distribute validation work across all the cores
-of your CPU. We don't want to slow down your CI or deploy process any more than
-we have to! We're also very careful to write the rules in a performant manner,
-leaning into the visitor pattern exposed by GraphQL.js and avoiding manual AST
-traversal where possible.
+of your CPU (memory allowing). We don't want to slow down your CI or deploy
+process any more than we have to! We're also very careful to write the rules in
+a performant manner, leaning into the visitor pattern exposed by GraphQL.js and
+avoiding manual AST traversal where possible.
 
 ## Designed to work with persisted operations
 
@@ -232,7 +232,8 @@ likely to want to change. For full configuration options, use TypeScript.
 const preset = {
   gqlcheck: {
     // How many workers should we spawn in the background? Defaults to the
-    // number of CPUs on this machine since walking ASTs is single threaded.
+    // number of CPUs on this machine (or less if insufficient RAM is
+    // available) since walking ASTs is single threaded.
     // workerCount: 4,
 
     // Update this to be the path to your GraphQL schema in SDL format. We

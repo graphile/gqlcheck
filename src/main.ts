@@ -63,6 +63,20 @@ async function loadBaseline(
   }
 }
 
+const KB = 1024;
+const MB = 1024 * KB;
+const GB = 1024 * MB;
+function defaultCount() {
+  const cores = os.cpus().length;
+
+  // Allow for 1.5GB per process. This should be overkill
+  const memory = os.freemem();
+  const memoryCoreLimit = Math.floor(memory / (1.5 * GB));
+
+  // Return at least 1, at most `cores` and at most `memoryCoreLimit`
+  return Math.max(1, Math.min(memoryCoreLimit, cores));
+}
+
 export async function checkOperations(
   getDocuments: () => AsyncIterable<string | SourceLike>,
   configPath?: string,
@@ -73,7 +87,7 @@ export async function checkOperations(
     rawConfig ?? {},
     { gqlcheck: overrideConfig },
   ]);
-  const { gqlcheck: { baselinePath, workerCount = os.cpus().length } = {} } =
+  const { gqlcheck: { baselinePath, workerCount = defaultCount() } = {} } =
     config;
   const baseline = await loadBaseline(baselinePath);
   const workerPromises: Promise<Worker>[] = [];
