@@ -73,6 +73,11 @@ function defaultCount() {
   const memory = os.freemem();
   const memoryCoreLimit = Math.floor(memory / (1.5 * GB));
 
+  // TODO: we should never run more workers than total number of documents
+  // divided by ~500 otherwise we get diminishing returns (and even slowdown on
+  // high core machines!). Need to have an idea of how many documents to
+  // expect.
+
   // Return at least 1, at most `cores` and at most `memoryCoreLimit`
   return Math.max(1, Math.min(memoryCoreLimit, cores));
 }
