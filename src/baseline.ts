@@ -32,7 +32,9 @@ export function generateBaseline(
           }
           const ignores = op.ignoreCoordinatesByRule[infraction];
           for (const coord of operationCoordinates) {
-            ignores.push(coord);
+            if (!ignores.includes(coord)) {
+              ignores.push(coord);
+            }
           }
         }
       }
