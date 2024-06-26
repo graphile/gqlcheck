@@ -46,7 +46,6 @@ export interface SourceLike {
 
 export interface SourceResultsBySourceName {
   [sourceName: string]: {
-    sourceString: string;
     output: CheckDocumentOutput;
   };
 }

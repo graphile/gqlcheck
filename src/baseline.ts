@@ -132,10 +132,10 @@ export function filterBaseline(
 ): CheckOperationsResult {
   let filtered = 0;
   const entries = Object.entries(result.rawResultsBySourceName)
-    .map(([sourceName, { output: rawOutput, sourceString }]) => {
+    .map(([sourceName, { output: rawOutput }]) => {
       const output = filterOutput(baseline, rawOutput);
       filtered += output.filtered;
-      return [sourceName, { output, sourceString }];
+      return [sourceName, { output }];
     })
     .filter((e) => e != null);
   const resultsBySourceName = Object.fromEntries(entries);
@@ -152,10 +152,10 @@ export function filterOnlyErrors(
 ): CheckOperationsResult {
   let filtered = 0;
   const entries = Object.entries(result.rawResultsBySourceName)
-    .map(([sourceName, { output: rawOutput, sourceString }]) => {
+    .map(([sourceName, { output: rawOutput }]) => {
       const output = filterOutputOnlyErrors(rawOutput);
       filtered += output.filtered;
-      return [sourceName, { output, sourceString }];
+      return [sourceName, { output }];
     })
     .filter((e) => e != null);
   const resultsBySourceName = Object.fromEntries(entries);

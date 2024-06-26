@@ -46,9 +46,9 @@ export async function getDirHelpers(dirname) {
         const resultsFile = `${dirname}/results.${scope ? scope + "." : ""}json5`;
         // Sort the results by key
         const results = Object.fromEntries(
-          Object.entries(result.resultsBySourceName)
-            .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
-            .map(([k, { sourceString, ...rest }]) => [k, rest]),
+          Object.entries(result.resultsBySourceName).sort((a, z) =>
+            a[0].localeCompare(z[0], "en-US"),
+          ),
         );
         const stringifiedResults = JSON5.stringify(results, null, 2) + "\n";
         /** @type { string | null} */

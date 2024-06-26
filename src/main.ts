@@ -228,7 +228,7 @@ export async function checkOperations(
   const counts: Exclude<CheckDocumentOutput["meta"]["count"], undefined> =
     Object.create(null);
   for (const { request, result } of allResults) {
-    const { sourceName, sourceString } = request;
+    const { sourceName } = request;
     const { operations } = result;
     for (const operation of operations) {
       const { operationName, operationKind } = operation;
@@ -246,7 +246,6 @@ export async function checkOperations(
       }
     }
     results[sourceName] = {
-      sourceString,
       output: result,
     };
     if (result.meta.count) {
