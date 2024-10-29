@@ -68,17 +68,21 @@ export interface CheckOperationsResult {
   filtered: number;
 }
 
+export interface BaselineOperationsIgnoreCoordinatesByRule {
+  [infraction: string]: string[] | undefined;
+}
+
+export interface BaselineOperations {
+  [operationName: string]:
+    | {
+        ignoreCoordinatesByRule: BaselineOperationsIgnoreCoordinatesByRule;
+      }
+    | undefined;
+}
+
 export interface Baseline {
   version: 1;
-  operations: {
-    [operationName: string]:
-      | {
-          ignoreCoordinatesByRule: {
-            [infraction: string]: string[] | undefined;
-          };
-        }
-      | undefined;
-  };
+  operations: BaselineOperations;
 }
 
 export interface CheckDocumentEvent {

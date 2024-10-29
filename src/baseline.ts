@@ -1,5 +1,7 @@
 import type {
   Baseline,
+  BaselineOperations,
+  BaselineOperationsIgnoreCoordinatesByRule,
   CheckDocumentOutput,
   CheckOperationsResult,
   SourceResultsBySourceName,
@@ -41,7 +43,51 @@ export function generateBaseline(
     }
   }
 
-  return baseline;
+  return sortBaseline(baseline);
+}
+
+function sortIgnoreCoordinatesByRule(
+  icbr: BaselineOperationsIgnoreCoordinatesByRule,
+): BaselineOperationsIgnoreCoordinatesByRule {
+  return Object.fromEntries(
+    Object.entries(icbr)
+      .sort((a, z) => {
+        return a[0].localeCompare(z[0], "en-US");
+      })
+      .map(([key, arr]) => [key, arr != null ? [...arr].sort() : arr]),
+  );
+}
+
+function sortOperations(ops: BaselineOperations): BaselineOperations {
+  return Object.fromEntries(
+    Object.entries(ops)
+      .sort((a, z) => a[0].localeCompare(z[0], "en-US"))
+      .map(([opName, val]) => {
+        if (val != null) {
+          const { ignoreCoordinatesByRule, ...rest } = val;
+          return [
+            opName,
+            {
+              ignoreCoordinatesByRule: sortIgnoreCoordinatesByRule(
+                ignoreCoordinatesByRule,
+              ),
+              ...rest,
+            },
+          ];
+        } else {
+          return [opName, val];
+        }
+      }),
+  );
+}
+
+export function sortBaseline(baseline: Baseline): Baseline {
+  const { version, operations, ...rest } = baseline;
+  return {
+    version,
+    operations: sortOperations(operations),
+    ...rest,
+  };
 }
 
 function filterOutput(
