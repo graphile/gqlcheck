@@ -13,6 +13,7 @@ export {
   filterBaseline,
   filterOnlyErrors,
   generateBaseline,
+  sortBaseline,
 } from "./baseline.js";
 export {
   Baseline,
