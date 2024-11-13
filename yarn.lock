@@ -1320,10 +1320,10 @@ keyv@^4.5.3:
   dependencies:
     json-buffer "3.0.1"
 
-kjsonl@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/kjsonl/-/kjsonl-0.0.1.tgz#053122fd8323bacceca3afd04270047fea13bf35"
-  integrity sha512-Pppf0/ZS8je6oJHh48WoaFZicJyzlcPUir8Wu6oSd9ASlkoc5gUukgJHwj9R2/5WAn/CgNaylqwv5/5k+UY4hg==
+kjsonl@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/kjsonl/-/kjsonl-0.3.0.tgz#f92ef28faec4688899ed341bece04aaf28f38a72"
+  integrity sha512-qomz0nJzRCHGxgff0czCNUjKqImLTAxLGgWQZuQ8IUdXDOxYwBDRLcV7lGRBmH3KApGOHB1P7sh83yjDbFabfw==
   dependencies:
     "@graphile/lru" "^4.11.0"
 
