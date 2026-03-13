@@ -63,7 +63,7 @@
     "typescript": "^5.5.1-rc"
   },
   "dependencies": {
-    "graphile-config": "^0.0.1-beta.9",
+    "graphile-config": "^1.0.0-rc.6",
     "graphql": "15.x || ^16.8.2 || ^17.0.0-alpha.3",
     "json5": "^2.2.3",
     "kjsonl": "^0.3.0",
