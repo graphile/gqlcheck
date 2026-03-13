@@ -60,7 +60,7 @@
     "eslint_d": "^13.1.2",
     "jest-diff": "^29.7.0",
     "prettier": "^3.3.2",
-    "typescript": "^5.5.1-rc"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "graphile-config": "^1.0.0-rc.6",
